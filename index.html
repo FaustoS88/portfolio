@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fausto Saccoccio | AI Agent Engineer</title>
+    <!-- Add favicon links here -->
+    <link rel="icon" href="Ai_logo.png" type="image/png">
+    <link rel="shortcut icon" href="Ai_logo.png" type="image/png">
+    <link rel="apple-touch-icon" href="Ai_logo.png">
+    <!-- End favicon links -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            scroll-behavior: smooth;
+            position: relative;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .glow-card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .glow-card:hover {
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+            transform: translateY(-5px);
+        }
+        
+        .tech-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .tech-icon:hover {
+            transform: scale(1.2);
+        }
+        
+        .animated-underline {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .animated-underline::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            transform: scaleX(0);
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            transform-origin: bottom right;
+            transition: transform 0.25s ease-out;
+        }
+        
+        .animated-underline:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+        
+        .blob {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(180deg, rgba(59, 130, 246, 0.15) 0%, rgba(236, 72, 153, 0.1) 100%);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            filter: blur(60px);
+            z-index: -1;
+            animation: blob-animate 15s infinite alternate;
+        }
+        
+        @keyframes blob-animate {
+            0% {
+                transform: translate(0px, 0px) rotate(0deg);
+            }
+            50% {
+                transform: translate(50px, 50px) rotate(180deg);
+            }
+            100% {
+                transform: translate(0px, 0px) rotate(360deg);
+            }
+        }
+        
+        .typewriter {
+            overflow: hidden;
+            border-right: 3px solid #3b82f6;
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: 2px;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #3b82f6; }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Background elements -->
+    <div class="blob top-[-250px] right-[-250px]"></div>
+    <div class="blob bottom-[-250px] left-[-250px]"></div>
+    <div class="fixed inset-0 w-full h-full opacity-10 z-0 pointer-events-none">
+        <img src="Ai_logo.png" alt="Background AI Logo" class="w-full h-full object-contain">
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-slate-900/80 backdrop-blur-md z-50 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <img src="Ai_logo.png" alt="AI Logo" class="h-8">
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-center space-x-8">
+                        <a href="#home" class="animated-underline px-3 py-2 text-sm font-medium">Home</a>
+                        <a href="#expertise" class="animated-underline px-3 py-2 text-sm font-medium">Expertise</a>
+                        <a href="#projects" class="animated-underline px-3 py-2 text-sm font-medium">Projects</a>
+                        <a href="#contact" class="animated-underline px-3 py-2 text-sm font-medium">Contact</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-300 hover:text-white focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-slate-900/95 backdrop-blur-lg">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#home" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-slate-800">Home</a>
+                <a href="#expertise" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-slate-800">Expertise</a>
+                <a href="#projects" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-slate-800">Projects</a>
+                <a href="#contact" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-slate-800">Contact</a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section id="home" class="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-12">
+            <div class="md:w-1/2">
+                <h1 class="text-4xl md:text-6xl font-bold mb-4">
+                    Hi, I'm <span class="gradient-text">Fausto Saccoccio</span>
+                </h1>
+                <h2 class="text-2xl md:text-3xl font-semibold mb-6 text-slate-300">
+                    <span class="typewriter">AI Engineer & Full Stack Developer</span>
+                </h2>
+                <p class="text-lg text-slate-400 mb-8 leading-relaxed">
+                    I craft <span class="font-semibold text-blue-400">custom AI solutions</span> using the cutting-hedge frameworks like Pydantic-AI and LangGraph. 
+                    Let's build your <span class="font-semibold text-purple-400">next-generation AI Agents</span> tailored to your specific needs.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#contact" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg font-medium hover:from-blue-500 hover:to-purple-500 transition-all duration-300 shadow-lg hover:shadow-xl">
+                        Get in Touch
+                    </a>
+                    <a href="#projects" class="px-6 py-3 border border-slate-600 rounded-lg font-medium hover:bg-slate-800 transition-all duration-300">
+                        View My Work
+                    </a>
+                </div>
+            </div>
+            <div class="md:w-1/2 relative">
+                <div class="relative w-full max-w-md mx-auto">
+                    <div class="absolute -inset-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl opacity-20 blur-xl"></div>
+                    <div class="relative bg-slate-800 rounded-xl overflow-hidden border border-slate-700">
+                        <div class="h-8 bg-slate-700 flex items-center px-4">
+                            <div class="h-3 w-3 rounded-full bg-red-500 mr-2"></div>
+                            <div class="h-3 w-3 rounded-full bg-yellow-500 mr-2"></div>
+                            <div class="h-3 w-3 rounded-full bg-green-500"></div>
+                        </div>
+                        <div class="p-6">
+                            <div class="text-green-400 font-mono text-sm mb-4">
+                                <span class="text-purple-400">class</span> <span class="text-blue-400">CustomAgent</span>:
+                            </div>
+                            <div class="text-green-400 font-mono text-sm ml-4 mb-4">
+                                <span class="text-purple-400">def</span> <span class="text-blue-400">__init__</span>(self):
+                            </div>
+                            <div class="text-green-400 font-mono text-sm ml-8 mb-4">
+                                self.<span class="text-yellow-400">framework</span> = <span class="text-green-600">"Pydantic-AI"</span>
+                            </div>
+                            <div class="text-green-400 font-mono text-sm ml-8 mb-4">
+                                self.<span class="text-yellow-400">capabilities</span> = [<span class="text-green-600">"RAG"</span>, <span class="text-green-600">"MCP"</span>, <span class="text-green-600">"LangGraph"</span>]
+                            </div>
+                            <div class="text-green-400 font-mono text-sm ml-4">
+                                <span class="text-purple-400">def</span> <span class="text-blue-400">solve</span>(self, problem):
+                            </div>
+                            <div class="text-green-400 font-mono text-sm ml-8">
+                                <span class="text-purple-400">return</span> <span class="text-green-600">"Solution tailored for you"</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Expertise Section -->
+    <section id="expertise" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                My <span class="gradient-text">Expertise</span>
+            </h2>
+            <p class="text-lg text-slate-400 max-w-3xl mx-auto">
+                Specializing in cutting-edge AI Agents development with a full stack approach
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- AI Agent Development -->
+            <div class="glow-card bg-slate-800/50 rounded-xl p-8 border border-slate-700">
+                <div class="text-blue-400 text-4xl mb-6">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4">AI Agent Engineering</h3>
+                <p class="text-slate-400 mb-6">
+                    Building sophisticated AI agents with frameworks like Pydantic-AI, LangGraph, and MCP architectures for complex problem-solving.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 bg-blue-900/30 text-blue-400 rounded-full text-sm">Pydantic-AI</span>
+                    <span class="px-3 py-1 bg-purple-900/30 text-purple-400 rounded-full text-sm">LangGraph</span>
+                    <span class="px-3 py-1 bg-green-900/30 text-green-400 rounded-full text-sm">RAG</span>
+                    <span class="px-3 py-1 bg-pink-900/30 text-pink-400 rounded-full text-sm">MCP-Servers</span>
+                </div>
+            </div>
+            
+            <!-- Full Stack Development -->
+            <div class="glow-card bg-slate-800/50 rounded-xl p-8 border border-slate-700">
+                <div class="text-purple-400 text-4xl mb-6">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4">Full Stack Development</h3>
+                <p class="text-slate-400 mb-6">
+                    End-to-end application development with modern technologies, ensuring seamless integration between frontend and backend systems.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 bg-red-900/30 text-red-400 rounded-full text-sm">FastAPI</span>
+                    <span class="px-3 py-1 bg-blue-900/30 text-blue-400 rounded-full text-sm">Typescript-React</span>
+                    <span class="px-3 py-1 bg-green-900/30 text-green-400 rounded-full text-sm">Node.js</span>
+                    <span class="px-3 py-1 bg-yellow-900/30 text-yellow-400 rounded-full text-sm">Python</span>
+                    <span class="px-3 py-1 bg-purple-900/30 text-purple-400 rounded-full text-sm">Vector-DB</span>
+                </div>
+            </div>
+            
+            <!-- Custom AI Solutions -->
+            <div class="glow-card bg-slate-800/50 rounded-xl p-8 border border-slate-700">
+                <div class="text-pink-400 text-4xl mb-6">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4">Custom AI Solutions</h3>
+                <p class="text-slate-400 mb-6">
+                    Tailored AI implementations designed specifically for your business needs, from concept to deployment.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 bg-blue-900/30 text-blue-400 rounded-full text-sm">Hybrid LLM Integration</span>
+                    <span class="px-3 py-1 bg-pink-900/30 text-pink-400 rounded-full text-sm">Custom Workflows</span>
+                    <span class="px-3 py-1 bg-purple-900/30 text-purple-400 rounded-full text-sm">Fine-tuning</span>
+                    <span class="px-3 py-1 bg-green-900/30 text-green-400 rounded-full text-sm">Agent Orchestration</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tech Stack -->
+        <div class="mt-20">
+            <h3 class="text-2xl font-bold mb-8 text-center">My <span class="gradient-text">Tech Stack</span></h3>
+            <div class="flex flex-wrap justify-center gap-8">
+                <div class="tech-icon text-5xl text-blue-400" title="Python">
+                    <i class="fab fa-python"></i>
+                </div>
+                <div class="tech-icon text-5xl text-green-500" title="Node.js">
+                    <i class="fab fa-node-js"></i>
+                </div>
+                <div class="tech-icon text-5xl text-yellow-400" title="JavaScript">
+                    <i class="fab fa-js"></i>
+                </div>
+                <div class="tech-icon text-5xl" title="TypeScript">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Typescript_logo_2020.svg" alt="TypeScript" class="h-10">
+                </div>
+                <div class="tech-icon text-5xl text-blue-500" title="React">
+                    <i class="fab fa-react"></i>
+                </div>
+                <div class="tech-icon text-5xl" title="Pydantic-AI">
+                    <img src="https://ai.pydantic.dev/img/logo-white.svg" alt="Pydantic-AI" class="h-10">
+                </div>
+                <div class="tech-icon text-5xl" title="LangGraph">
+                    <img src="langgraph-color.ico" alt="LangGraph" class="h-10">
+                </div>
+                <div class="tech-icon text-5xl" title="MCP">
+                    <img src="mcp.ico" alt="MCP" class="h-10">
+                </div>
+                <div class="tech-icon text-5xl" title="GitHub">
+                    <img src="github.ico" alt="GitHub" class="h-10">
+                </div>
+                <div class="tech-icon text-5xl" title="AWS">
+                    <img src="aws-color (1).ico" alt="AWS" class="h-10">
+                </div>
+                <div class="tech-icon text-5xl" title="Anthropic">
+                    <img src="anthropic.ico" alt="Anthropic" class="h-10">
+                </div>
+                <div class="tech-icon text-5xl" title="DeepSeek">
+                    <img src="deepseek-color.ico" alt="DeepSeek" class="h-10">
+                </div>
+                <div class="tech-icon text-5xl" title="Gemini">
+                    <img src="gemini-color.ico" alt="Gemini" class="h-10">
+                </div>
+                <div class="tech-icon text-5xl" title="HuggingFace">
+                    <img src="huggingface-color.ico" alt="HuggingFace" class="h-10">
+                </div>
+                <div class="tech-icon text-5xl" title="Colab">
+                    <img src="colab-color.ico" alt="Colab" class="h-10">
+                </div>
+            </div>
+        </div>
+    </section>
+
+        <!-- After Expertise Section -->
+    <section id="process" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-slate-900/50">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                My <span class="gradient-text">Process</span>
+            </h2>
+            <p class="text-lg text-slate-400 max-w-3xl mx-auto">
+                How I approach AI agent development from concept to deployment
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+                <div class="text-blue-400 text-3xl mb-4 flex justify-center">
+                    <div class="h-16 w-16 rounded-full bg-blue-900/30 flex items-center justify-center">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold mb-3 text-center">1. Discovery</h3>
+                <p class="text-slate-400">
+                    Deep dive into your business needs, identifying opportunities where AI can create the most value.
+                </p>
+            </div>
+            
+            <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+                <div class="text-purple-400 text-3xl mb-4 flex justify-center">
+                    <div class="h-16 w-16 rounded-full bg-purple-900/30 flex items-center justify-center">
+                        <i class="fas fa-drafting-compass"></i>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold mb-3 text-center">2. Architecture</h3>
+                <p class="text-slate-400">
+                    Designing the optimal AI agent architecture with the right frameworks and integration points.
+                </p>
+            </div>
+            
+            <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+                <div class="text-green-400 text-3xl mb-4 flex justify-center">
+                    <div class="h-16 w-16 rounded-full bg-green-900/30 flex items-center justify-center">
+                        <i class="fas fa-code"></i>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold mb-3 text-center">3. Development</h3>
+                <p class="text-slate-400">
+                    Iterative implementation with continuous testing and refinement to ensure optimal performance.
+                </p>
+            </div>
+            
+            <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+                <div class="text-pink-400 text-3xl mb-4 flex justify-center">
+                    <div class="h-16 w-16 rounded-full bg-pink-900/30 flex items-center justify-center">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold mb-3 text-center">4. Deployment</h3>
+                <p class="text-slate-400">
+                    Seamless integration into your existing systems with ongoing support and optimization.
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Projects Section -->
+    <section id="projects" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-slate-900/50">
+     <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                Featured <span class="gradient-text">Projects</span>
+            </h2>
+            <p class="text-lg text-slate-400 max-w-3xl mx-auto">
+                Some of my recent work in AI agent development and full stack solutions
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- PineScript Expert -->
+            <div class="glow-card bg-slate-800/50 rounded-xl overflow-hidden border border-slate-700">
+                <div class="h-48 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 flex items-center justify-center">
+                    <div class="text-center p-6">
+                        <h3 class="text-2xl font-bold mb-2">PineScript Expert</h3>
+                        <p class="text-slate-300">TradingView Pine Script AI Agent</p>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-slate-400 mb-4">
+                        RAG AI Agent built with Pydantic AI that serves as an expert on Pine Script v6, 
+                        providing accurate answers and generating working code examples for TradingView indicators and strategies.
+                    </p>
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <span class="px-3 py-1 bg-blue-900/30 text-blue-400 rounded-full text-sm">Pydantic-AI</span>
+                        <span class="px-3 py-1 bg-purple-900/30 text-purple-400 rounded-full text-sm">RAG</span>
+                        <span class="px-3 py-1 bg-green-900/30 text-green-400 rounded-full text-sm">pgvector</span>
+                        <span class="px-3 py-1 bg-yellow-900/30 text-yellow-400 rounded-full text-sm">Streamlit</span>
+                        <span class="px-3 py-1 bg-red-900/30 text-red-400 rounded-full text-sm">OpenRouter</span>
+                    </div>
+                    <a href="https://github.com/FaustoS88/Pydantic-AI-Pinescript-Expert" target="_blank" class="text-blue-400 hover:text-blue-300 font-medium">View Details →</a>
+                </div>
+            </div>
+            
+            <!-- ChartSage -->
+            <div class="glow-card bg-slate-800/50 rounded-xl overflow-hidden border border-slate-700">
+                <div class="h-48 bg-gradient-to-r from-blue-600/20 to-purple-600/20 flex items-center justify-center">
+                    <div class="text-center p-6">
+                        <h3 class="text-2xl font-bold mb-2">ChartSage</h3>
+                        <p class="text-slate-300">Advanced Trading Analysis AI</p>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-slate-400 mb-4">
+                        AI-powered trading analysis platform providing real-time technical insights, 
+                        pattern recognition, and actionable recommendations.
+                    </p>
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <span class="px-3 py-1 bg-blue-900/30 text-blue-400 rounded-full text-sm">Pydantic-AI</span>
+                        <span class="px-3 py-1 bg-purple-900/30 text-purple-400 rounded-full text-sm">LangChain</span>
+                        <span class="px-3 py-1 bg-green-900/30 text-green-400 rounded-full text-sm">TradingView</span>
+                        <span class="px-3 py-1 bg-yellow-900/30 text-yellow-400 rounded-full text-sm">FastAPI</span>
+                        <span class="px-3 py-1 bg-red-900/30 text-red-400 rounded-full text-sm">OpenRouter</span>
+                    </div>
+                    <a href="https://github.com/FaustoS88/ChartSage" target="_blank" class="text-blue-400 hover:text-blue-300 font-medium">View Details →</a>
+                </div>
+            </div>
+
+            <!-- CryptoHedge -->
+            <div class="glow-card bg-slate-800/50 rounded-xl overflow-hidden border border-slate-700">
+                <div class="h-48 bg-gradient-to-r from-indigo-600/20 to-blue-600/20 flex items-center justify-center">
+                    <div class="text-center p-6">
+                        <h3 class="text-2xl font-bold mb-2">CryptoHedge</h3>
+                        <p class="text-slate-300">Cryptocurrency Analysis System</p>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-slate-400 mb-4">
+                        Comprehensive crypto market analysis with sentiment evaluation, 
+                        macro-economic assessment, and trading strategy generation.
+                    </p>
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <span class="px-3 py-1 bg-blue-900/30 text-blue-400 rounded-full text-sm">Pydantic-AI</span>
+                        <span class="px-3 py-1 bg-purple-900/30 text-purple-400 rounded-full text-sm">Telegram API</span>
+                        <span class="px-3 py-1 bg-green-900/30 text-green-400 rounded-full text-sm">Binance</span>
+                        <span class="px-3 py-1 bg-yellow-900/30 text-yellow-400 rounded-full text-sm">PostgreSQL</span>
+                    </div>
+                    <a href="https://github.com/FaustoS88/cryptohedge" target="_blank" class="text-purple-400 hover:text-purple-300 font-medium">View Details →</a>
+                </div>
+            </div>
+
+
+            <!-- STT with Memory -->
+            <div class="glow-card bg-slate-800/50 rounded-xl overflow-hidden border border-slate-700">
+                <div class="h-48 bg-gradient-to-r from-indigo-600/20 to-blue-600/20 flex items-center justify-center">
+                    <div class="text-center p-6">
+                        <h3 class="text-2xl font-bold mb-2">STT with Memory</h3>
+                        <p class="text-slate-300">AI Companion with Long-term Memory</p>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <p class="text-slate-400 mb-4">
+                        Conversational AI system combining speech recognition with long-term memory 
+                        using Faster-Whisper and Mem0 + PostgreSQL for contextual awareness.
+                    </p>
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <span class="px-3 py-1 bg-blue-900/30 text-blue-400 rounded-full text-sm">Faster-Whisper</span>
+                        <span class="px-3 py-1 bg-purple-900/30 text-purple-400 rounded-full text-sm">Mem0</span>
+                        <span class="px-3 py-1 bg-green-900/30 text-green-400 rounded-full text-sm">PostgreSQL</span>
+                        <span class="px-3 py-1 bg-yellow-900/30 text-yellow-400 rounded-full text-sm">DeepSeek</span>
+                    </div>
+                    <a href="https://github.com/FaustoS88/STT-mem0" target="_blank" class="text-indigo-400 hover:text-indigo-300 font-medium">View Details →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                Get <span class="gradient-text">In Touch</span>
+            </h2>
+            <p class="text-lg text-slate-400 max-w-3xl mx-auto">
+                Connect with me on professional networks
+            </p>
+        </div>
+        
+        <!-- Social Links -->
+        <div class="flex justify-center gap-8 mb-12">
+            <a href="https://www.linkedin.com/in/fausto-saccoccio-6966201aa/" target="_blank" rel="noopener noreferrer" 
+               class="text-5xl text-blue-500 hover:text-blue-400 transition-all duration-300">
+                <i class="fab fa-linkedin"></i>
+            </a>
+            <a href="https://github.com/FaustoS88" target="_blank" rel="noopener noreferrer"
+               class="text-5xl text-gray-300 hover:text-white transition-all duration-300">
+                <i class="fab fa-github"></i>
+            </a>
+        </div>
+
