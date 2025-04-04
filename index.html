@@ -20,6 +20,19 @@
             color: #e2e8f0;
             scroll-behavior: smooth;
             position: relative;
+            overflow-x: hidden; /* Prevent horizontal scroll on mobile */
+        }
+        
+        /* Improved mobile typography */
+        h1 {
+            font-size: 2.5rem;
+            line-height: 1.2;
+        }
+        
+        @media (min-width: 768px) {
+            h1 {
+                font-size: 3.5rem;
+            }
         }
         
         .gradient-text {
@@ -155,30 +168,32 @@
         </div>
     </nav>
     
-    <!-- Hero Section -->
-    <section id="home" class="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-12">
-            <div class="md:w-1/2">
-                <h1 class="text-4xl md:text-6xl font-bold mb-4">
+    <!-- Hero Section - Improved for mobile -->
+    <section id="home" class="pt-24 md:pt-32 pb-12 md:pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
+            <div class="w-full md:w-1/2">
+                <h1 class="text-3xl md:text-4xl lg:text-6xl font-bold mb-3 md:mb-4">
                     Hi, I'm <span class="gradient-text">Fausto Saccoccio</span>
                 </h1>
-                <h2 class="text-2xl md:text-3xl font-semibold mb-6 text-slate-300">
+                <h2 class="text-xl md:text-2xl lg:text-3xl font-semibold mb-4 md:mb-6 text-slate-300">
                     <span class="typewriter">AI Engineer & Full Stack Developer</span>
                 </h2>
-                <p class="text-lg text-slate-400 mb-8 leading-relaxed">
+                <p class="text-base md:text-lg text-slate-400 mb-6 md:mb-8 leading-relaxed">
                     I craft <span class="font-semibold text-blue-400">custom AI solutions</span> using the cutting-hedge frameworks like Pydantic-AI and LangGraph. 
                     Let's build your <span class="font-semibold text-purple-400">next-generation AI Agents</span> tailored to your specific needs.
                 </p>
-                <div class="flex flex-wrap gap-4">
-                    <a href="#contact" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg font-medium hover:from-blue-500 hover:to-purple-500 transition-all duration-300 shadow-lg hover:shadow-xl">
+                <div class="flex flex-wrap gap-3 md:gap-4">
+                    <a href="#contact" class="w-full sm:w-auto px-5 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg font-medium hover:from-blue-500 hover:to-purple-500 transition-all duration-300 shadow-lg hover:shadow-xl text-center">
                         Get in Touch
                     </a>
-                    <a href="#projects" class="px-6 py-3 border border-slate-600 rounded-lg font-medium hover:bg-slate-800 transition-all duration-300">
+                    <a href="#projects" class="w-full sm:w-auto px-5 py-3 border border-slate-600 rounded-lg font-medium hover:bg-slate-800 transition-all duration-300 text-center">
                         View My Work
                     </a>
                 </div>
             </div>
-            <div class="md:w-1/2 relative">
+            
+            <!-- Code display - better sized for mobile -->
+            <div class="w-full md:w-1/2 relative mt-8 md:mt-0">
                 <div class="relative w-full max-w-md mx-auto">
                     <div class="absolute -inset-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl opacity-20 blur-xl"></div>
                     <div class="relative bg-slate-800 rounded-xl overflow-hidden border border-slate-700">
