@@ -24,7 +24,7 @@ TONE: Professional, technically precise, fast-paced. Emphasize his ability to sh
 
 const AgentChat = () => {
     const [messages, setMessages] = useState([
-        { role: 'system', content: 'Connection established to FaustoOS v2.0... (Powered by Gemini Flash 8B)' },
+        { role: 'system', content: 'Connection established to FaustoOS v2.0... (Powered by Gemini 2.5 Flash-Lite)' },
         { role: 'model', content: "Hello. I'm an autonomous agent designed to answer questions about Fausto Saccoccio's engineering capabilities. What would you like to know?" }
     ]);
     const [input, setInput] = useState('');
@@ -67,7 +67,7 @@ const AgentChat = () => {
             const dynamicAi = new GoogleGenAI({ apiKey: activeKey });
             // Lightweight one-shot request with system instruction config
             const response = await dynamicAi.models.generateContent({
-                model: 'gemini-1.5-flash-8b',
+                model: 'gemini-2.5-flash-lite',
                 contents: userInput,
                 config: {
                     systemInstruction: SYSTEM_INSTRUCTION,
@@ -81,7 +81,18 @@ const AgentChat = () => {
             if (error?.message?.includes('API key not valid') || error?.status === 401 || error?.status === 403) {
                 return "Authentication error: The provided API key is invalid or unauthorized. Please verify your custom key in the settings panel.";
             }
-            return "Error connecting to the LLM endpoint. Please check the console log.";
+
+            // Try to extract a readable message if it's a JSON string from Google
+            let errorMessage = "Unknown error connecting to the LLM endpoint.";
+            try {
+                const parsed = JSON.parse(error.message);
+                if (parsed.error && parsed.error.message) {
+                    errorMessage = parsed.error.message;
+                }
+            } catch (e) {
+                errorMessage = error.message || error.toString();
+            }
+            return `Gemini API Error: ${errorMessage}`;
         }
     };
 
