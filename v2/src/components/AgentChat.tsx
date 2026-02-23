@@ -4,7 +4,7 @@ import { GoogleGenAI } from '@google/genai';
 import { FAUSTO_AGENT_PROMPT } from '../data/agentPrompt';
 
 const INITIAL_MESSAGES = [
-    { role: 'system', content: 'Connection established to FaustoOS v2.0... (Powered by Gemini 2.5 Flash)' },
+    { role: 'system', content: 'Connection established to FaustoOS v2.0... (Powered by Gemini 3.1 Pro)' },
     { role: 'model', content: "Hello! I'm a specialized AI agent designed to answer questions about Fausto Saccoccio's engineering capabilities. To get started, please click the Settings icon (⚙️) above to paste your Gemini API key!" }
 ];
 
@@ -88,8 +88,8 @@ const AgentChat = () => {
                         }]
                     }
                 ];
-                // Upgrade to the Pro model when using Complex Tools/Function Calling to prevent 'Unsupported by model' errors
-                chosenModel = 'gemini-2.5-pro';
+                // Upgrade to the 3.1 Pro Preview Custom Tools model. The 2.5 models reject payloads mixing native Google Search + Custom Functions.
+                chosenModel = 'gemini-3.1-pro-preview-customtools';
             }
 
             // Convert local state messages to Gemini prompt format and append new input
