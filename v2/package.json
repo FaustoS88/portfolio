@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "test:gemini-tools": "node test-gemini-tools.mjs"
   },
   "dependencies": {
     "@google/genai": "^1.42.0",

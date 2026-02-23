@@ -8,12 +8,21 @@ The current active iteration of the portfolio is located in the `v2/` directory.
 - **TypeScript**
 - **Vite**
 - **Tailwind CSS v4** (Glassmorphism & deep dark aesthetics)
+- **Gemini-powered chat agent** with client-side docs mini-RAG
 
 ### Local Development
 To run the portfolio locally:
 1. Navigate to the `v2` directory: `cd v2`
 2. Install dependencies: `npm install`
 3. Run the development server: `npm run dev`
+4. (Optional) Add `VITE_GEMINI_API_KEY` in a local `.env`
+
+### Basic Validation (Public Repo Friendly)
+From `v2/`:
+1. Build check: `npm run build`
+2. Gemini tool compatibility check: `npm run test:gemini-tools`
+
+Detailed implementation notes are in `v2/README.md`.
 
 ### Deployment
 The project is configured for free hosting on GitHub Pages. To deploy updates:
