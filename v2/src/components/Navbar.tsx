@@ -35,8 +35,8 @@ const Navbar = ({ theme, setTheme, lang, setLang, navText }: NavbarProps) => {
                         <span className={`ml-3 font-semibold text-lg tracking-tight hidden sm:block ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>Fausto Saccoccio</span>
                     </div>
 
-                    <div className="hidden md:block">
-                        <div className="ml-10 flex items-center space-x-6">
+                    <div className="hidden lg:block">
+                        <div className="ml-8 flex items-center space-x-4">
                             {links.map((link) => (
                                 <a
                                     key={link.name}
@@ -66,7 +66,7 @@ const Navbar = ({ theme, setTheme, lang, setLang, navText }: NavbarProps) => {
                         </div>
                     </div>
 
-                    <div className="md:hidden flex items-center">
+                    <div className="lg:hidden flex items-center">
                         <button
                             type="button"
                             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}

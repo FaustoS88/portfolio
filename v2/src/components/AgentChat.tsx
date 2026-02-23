@@ -30,6 +30,7 @@ const AgentChat = ({ lang }: AgentChatProps) => {
     const [useWebSearch, setUseWebSearch] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [showKeyHelp, setShowKeyHelp] = useState(false);
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const isSendingRef = useRef(false);
 
@@ -395,9 +396,16 @@ const AgentChat = ({ lang }: AgentChatProps) => {
                             </button>
                         </form>
                         <div className="flex items-center justify-end gap-1.5 mt-1">
-                            <div className="relative group flex items-center">
-                                <HelpCircle size={12} className="text-slate-500 hover:text-slate-300 cursor-help" />
-                                <div className="absolute bottom-full right-0 mb-2 w-48 p-2 bg-slate-800 border border-slate-700 rounded shadow-xl text-[10px] text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                            <div className="relative flex items-center">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowKeyHelp(prev => !prev)}
+                                    className="p-1 rounded text-slate-500 hover:text-slate-300 hover:bg-slate-800/70 transition-colors"
+                                    aria-label="API key help"
+                                >
+                                    <HelpCircle size={14} className="cursor-pointer" />
+                                </button>
+                                <div className={`absolute bottom-full right-0 mb-2 w-52 p-2 bg-slate-800 border border-slate-700 rounded shadow-xl text-[10px] text-slate-300 transition-opacity z-50 ${showKeyHelp ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
                                     Generate a free key, paste it here, and click Save. Your key is stored securely in your browser and is never sent to our servers.
                                 </div>
                             </div>

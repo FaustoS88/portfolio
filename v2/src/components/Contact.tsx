@@ -37,8 +37,8 @@ const Contact = ({ theme, text }: ContactProps) => {
                             {text.hello}
                         </a>
 
-                        <div className={`flex items-center gap-2 px-6 py-4 rounded-xl border w-full sm:w-auto justify-center ${theme === 'dark' ? 'text-slate-400 bg-slate-900/50 border-slate-700/50' : 'text-slate-700 bg-slate-100 border-slate-300'}`}>
-                            <MapPin size={18} className="text-rose-400" />
+                        <div className={`flex items-center gap-2 px-6 py-4 rounded-xl border w-full sm:w-auto justify-center ${theme === 'dark' ? 'text-slate-400 bg-slate-900/50 border-slate-700/50' : 'text-slate-900 bg-white border-slate-300'}`}>
+                            <MapPin size={18} className={theme === 'dark' ? 'text-rose-400' : 'text-slate-900'} />
                             <span>{theme === 'dark' ? 'Barcelona, Spain' : 'Barcelona, Spain'}</span>
                         </div>
                     </div>
