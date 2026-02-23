@@ -3,45 +3,40 @@ import { Terminal as TerminalIcon, Send, Bot, Key, Settings2, Globe } from 'luci
 import { GoogleGenAI } from '@google/genai';
 import { FAUSTO_AGENT_PROMPT } from '../data/agentPrompt';
 
+const INITIAL_MESSAGES = [
+    { role: 'system', content: 'Connection established to FaustoOS v2.0... (Powered by Gemini 2.5 Flash-Lite)' },
+    { role: 'model', content: "Hello. I'm a specialized AI agent designed to answer questions about Fausto Saccoccio's engineering capabilities. What would you like to know?" }
+];
+
 const AgentChat = () => {
-    const [messages, setMessages] = useState([
-        { role: 'system', content: 'Connection established to FaustoOS v2.0... (Powered by Gemini 2.5 Flash-Lite)' },
-        { role: 'model', content: "Hello. I'm an autonomous agent designed to answer questions about Fausto Saccoccio's engineering capabilities. What would you like to know?" }
-    ]);
+    const [messages, setMessages] = useState<{ role: string, content: string }[]>(() => {
+        const saved = localStorage.getItem('chatHistory');
+        if (saved) {
+            try { return JSON.parse(saved); } catch (e) { return INITIAL_MESSAGES; }
+        }
+        return INITIAL_MESSAGES;
+    });
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const [messageCount, setMessageCount] = useState(parseInt(localStorage.getItem('chatMsgCount') || '0'));
     const [showKeyInput, setShowKeyInput] = useState(false);
     const [customKey, setCustomKey] = useState(localStorage.getItem('customGeminiKey') || '');
-    const [braveKey, setBraveKey] = useState(localStorage.getItem('braveApiKey') || '');
     const [useWebSearch, setUseWebSearch] = useState(false);
     const chatContainerRef = useRef<HTMLDivElement>(null);
 
     const handleSaveKey = (e: React.FormEvent) => {
         e.preventDefault();
         const trimmedKey = customKey.trim();
-        const trimmedBrave = braveKey.trim();
         localStorage.setItem('customGeminiKey', trimmedKey);
-        localStorage.setItem('braveApiKey', trimmedBrave);
         setShowKeyInput(false);
-        setMessages(prev => [...prev, { role: 'system', content: trimmedKey || trimmedBrave ? 'Custom API keys saved! Guest limits disabled.' : 'Custom API keys removed. Using guest rate limits.' }]);
+        setMessages(prev => [...prev, { role: 'system', content: trimmedKey ? 'Custom API key saved! Guest limits disabled.' : 'Custom API key removed. Using guest rate limits.' }]);
     };
 
-    const braveSearch = async (query: string, apiKey: string) => {
-        try {
-            const res = await fetch(`https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}`, {
-                headers: {
-                    'Accept': 'application/json',
-                    'Accept-Encoding': 'gzip',
-                    'X-Subscription-Token': apiKey
-                }
-            });
-            if (!res.ok) return "Web search failed. Please verify your Brave Search API Key.";
-            const data = await res.json();
-            return data.web?.results?.map((r: any) => `${r.title}: ${r.description} (${r.url})`).join('\n') || "No results found.";
-        } catch (e) {
-            return `Web search error: ${e}`;
-        }
+    const handleClearChat = () => {
+        setMessages(INITIAL_MESSAGES);
+        localStorage.removeItem('chatHistory');
+        localStorage.setItem('chatMsgCount', '0');
+        setMessageCount(0);
     };
 
     const scrollToBottom = () => {
@@ -55,13 +50,13 @@ const AgentChat = () => {
 
     useEffect(() => {
         scrollToBottom();
+        localStorage.setItem('chatHistory', JSON.stringify(messages));
     }, [messages, isTyping]);
 
-    const getAgentResponse = async (userInput: string) => {
+    const getAgentResponse = async (userInput: string, chatHistory: any[]) => {
         const activeKey = customKey.trim() || import.meta.env.VITE_GEMINI_API_KEY;
 
         if (!activeKey) {
-            // Fallback for demo without key
             return "FaustoOS is currently in offline demo mode. Please click the Settings/Gear icon above to provide your own Gemini API key and activate the agent safely, or reach out to Fausto directly via email at faustosaccoccio1988@gmail.com!";
         }
 
@@ -69,55 +64,27 @@ const AgentChat = () => {
             const dynamicAi = new GoogleGenAI({ apiKey: activeKey });
 
             let tools: any = undefined;
-            if (useWebSearch && braveKey.trim()) {
-                tools = [{
-                    functionDeclarations: [{
-                        name: 'searchWeb',
-                        description: 'Search the web using Brave Search API to find real-time information or answer user queries outside your knowledge.',
-                        parameters: {
-                            type: 'OBJECT',
-                            properties: { query: { type: 'STRING', description: 'The search query string.' } },
-                            required: ['query']
-                        }
-                    }]
-                }];
+            if (useWebSearch) {
+                // Native Gemini Google Search Grounding
+                tools = [{ googleSearch: {} }];
             }
 
-            // Initial Request
+            // Convert local state messages to Gemini prompt format and append new input
+            const historyContents = chatHistory
+                .filter(m => m.role !== 'system')
+                .map(m => ({ role: m.role, parts: [{ text: m.content }] }));
+
+            historyContents.push({ role: 'user', parts: [{ text: userInput }] });
+
             const response = await dynamicAi.models.generateContent({
                 model: 'gemini-2.5-flash-lite',
-                contents: userInput,
+                contents: historyContents,
                 config: {
                     systemInstruction: FAUSTO_AGENT_PROMPT,
                     temperature: 0.2,
                     tools: tools
                 }
             });
-
-            // Handle Function Call
-            if (response.functionCalls && response.functionCalls.length > 0) {
-                const call = response.functionCalls[0];
-                if (call.name === 'searchWeb') {
-                    const query = (call.args as any)?.query || userInput;
-                    setMessages(prev => [...prev, { role: 'system', content: `[Agent Output] 🌐 Searching web for: "${query}"...` }]);
-                    const searchResults = await braveSearch(query, braveKey.trim());
-
-                    // Second Request with Function Response
-                    const followUpResponse = await dynamicAi.models.generateContent({
-                        model: 'gemini-2.5-flash-lite',
-                        contents: [
-                            { role: 'user', parts: [{ text: userInput }] },
-                            { role: 'model', parts: [{ functionCall: { name: 'searchWeb', args: call.args } }] },
-                            { role: 'function', parts: [{ functionResponse: { name: 'searchWeb', response: { result: searchResults } } }] }
-                        ],
-                        config: {
-                            systemInstruction: FAUSTO_AGENT_PROMPT,
-                            temperature: 0.2
-                        }
-                    });
-                    return followUpResponse.text || "I was unable to formulate a response to the search.";
-                }
-            }
 
             return response.text || "I was unable to formulate a response.";
         } catch (error: any) {
@@ -126,7 +93,6 @@ const AgentChat = () => {
                 return "Authentication error: The provided API key is invalid or unauthorized. Please verify your custom key in the settings panel.";
             }
 
-            // Try to extract a readable message if it's a JSON string from Google
             let errorMessage = "Unknown error connecting to the LLM endpoint.";
             try {
                 const parsed = JSON.parse(error.message);
@@ -149,7 +115,7 @@ const AgentChat = () => {
 
         // Only enforce rate limit if no custom key is provided
         if (!customKey.trim() && messageCount >= 10) {
-            setMessages(prev => [...prev, { role: 'user', content: userMessage }, { role: 'system', content: 'RATE LIMIT EXCEEDED' }, { role: 'model', content: "Host rate limit exceeded. Guest sessions are limited to 10 messages to prevent API abuse. To continue chatting, please provide your own Gemini API key by clicking the gear icon above, or contact Fausto at faustosaccoccio1988@gmail.com." }]);
+            setMessages(prev => [...prev, { role: 'user', content: userMessage }, { role: 'system', content: 'RATE LIMIT EXCEEDED' }, { role: 'model', content: "Host rate limit exceeded. Guest sessions are limited to 10 messages to prevent API abuse. To continue chatting, please provide your own Gemini API key." }]);
             return;
         }
 
@@ -161,10 +127,12 @@ const AgentChat = () => {
             });
         }
 
+        // Keep local reference to history for the API call 
+        const currentHistory = [...messages];
         setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
         setIsTyping(true);
 
-        const response = await getAgentResponse(userMessage);
+        const response = await getAgentResponse(userMessage, currentHistory);
 
         setMessages(prev => [...prev, { role: 'model', content: response }]);
         setIsTyping(false);
@@ -187,21 +155,27 @@ const AgentChat = () => {
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
-                        {braveKey.trim() && (
-                            <button
-                                type="button"
-                                onClick={() => setUseWebSearch(!useWebSearch)}
-                                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-colors text-xs font-medium border ${useWebSearch ? 'text-emerald-400 bg-emerald-400/10 border-emerald-500/30' : 'text-slate-500 bg-slate-800/50 border-slate-700/50 hover:text-slate-300'}`}
-                                title="Toggle Web Browsing"
-                            >
-                                <Globe size={14} className={useWebSearch ? 'animate-pulse' : ''} />
-                                <span className="hidden sm:inline">{useWebSearch ? 'Web Search ON' : 'Web Search OFF'}</span>
-                            </button>
-                        )}
+                        <button
+                            type="button"
+                            onClick={handleClearChat}
+                            className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-400/10 rounded-md transition-colors text-xs font-medium"
+                            title="Clear Chat History"
+                        >
+                            Clear
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setUseWebSearch(!useWebSearch)}
+                            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-colors text-xs font-medium border ${useWebSearch ? 'text-emerald-400 bg-emerald-400/10 border-emerald-500/30' : 'text-slate-500 bg-slate-800/50 border-slate-700/50 hover:text-slate-300'}`}
+                            title="Toggle Web Browsing"
+                        >
+                            <Globe size={14} className={useWebSearch ? 'animate-pulse' : ''} />
+                            <span className="hidden sm:inline">{useWebSearch ? 'Web Search ON' : 'Web Search OFF'}</span>
+                        </button>
                         <button
                             type="button"
                             onClick={() => setShowKeyInput(!showKeyInput)}
-                            className={`p-1.5 rounded-md transition-colors ${customKey.trim() || braveKey.trim() ? 'text-emerald-400 bg-emerald-400/10' : 'text-slate-400 hover:text-blue-400 hover:bg-blue-400/10'}`}
+                            className={`p-1.5 rounded-md transition-colors ${customKey.trim() ? 'text-emerald-400 bg-emerald-400/10' : 'text-slate-400 hover:text-blue-400 hover:bg-blue-400/10'}`}
                             title="Bring Your Own Keys"
                         >
                             <Settings2 size={16} />
@@ -212,32 +186,22 @@ const AgentChat = () => {
                 {/* BYOK Input Area */}
                 {showKeyInput && (
                     <div className="px-4 py-3 bg-slate-900/50 border-t border-slate-800/50 flex flex-col gap-2">
-                        <form onSubmit={handleSaveKey} className="flex flex-col sm:flex-row gap-2">
+                        <form onSubmit={handleSaveKey} className="flex gap-2">
                             <div className="relative flex-1 text-slate-500">
                                 <span className="absolute left-3 top-1/2 -translate-y-1/2"><Key size={14} /></span>
                                 <input
                                     type="password"
                                     value={customKey}
                                     onChange={(e) => setCustomKey(e.target.value)}
-                                    placeholder="Gemini API Key..."
+                                    placeholder="Paste Gemini API Key (Optional)..."
                                     className="w-full bg-slate-950 border border-slate-700 rounded-lg py-1.5 pl-9 pr-3 text-slate-300 font-mono text-xs focus:outline-none focus:border-blue-500/50 placeholder:text-slate-600"
-                                />
-                            </div>
-                            <div className="relative flex-1 text-slate-500">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2"><Globe size={14} /></span>
-                                <input
-                                    type="password"
-                                    value={braveKey}
-                                    onChange={(e) => setBraveKey(e.target.value)}
-                                    placeholder="Brave API Key..."
-                                    className="w-full bg-slate-950 border border-slate-700 rounded-lg py-1.5 pl-9 pr-3 text-slate-300 font-mono text-xs focus:outline-none focus:border-emerald-500/50 placeholder:text-slate-600"
                                 />
                             </div>
                             <button
                                 type="submit"
                                 className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-medium transition-colors whitespace-nowrap"
                             >
-                                Save Keys
+                                Save Key
                             </button>
                         </form>
                         <a

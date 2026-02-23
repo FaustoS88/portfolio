@@ -15,7 +15,7 @@ const Hero = () => {
 
                 <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6 leading-[1.05]">
                     Architecting <br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-emerald-400 to-green-400 animate-pulse-glow">Autonomous AI</span>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-emerald-400 to-green-400 animate-pulse-glow">Intelligence</span>
                 </h1>
 
                 <p className="text-base sm:text-lg md:text-xl text-slate-400 max-w-xl font-light leading-relaxed mb-10">

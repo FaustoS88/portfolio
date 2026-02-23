@@ -16,7 +16,7 @@ const Projects = () => {
         },
         {
             title: "Pydantic-AI-Gmail-Agent",
-            description: "Fully autonomous AI agent built to manage professional Gmail accounts. Processes starred emails, generates contextual replies, and manages spam gracefully.",
+            description: "Self-managing AI agent built to handle professional Gmail accounts. Processes starred emails, generates contextual replies, and manages spam gracefully.",
             stars: 7,
             tags: ["Python", "Pydantic-AI", "Gmail API", "Automation"],
             githubUrl: "https://github.com/FaustoS88/Pydantic-AI-Gmail-Agent",
@@ -59,7 +59,7 @@ const Projects = () => {
                     Featured <span className="text-gradient">Engineering</span>
                 </h2>
                 <p className="text-slate-400 max-w-2xl mx-auto text-lg md:text-xl font-light">
-                    Hover over the cards to explore the technical architecture and statistics behind my open-source autonomous agents.
+                    Hover over the cards to explore the technical architecture and statistics behind my open-source intelligence platforms.
                 </p>
             </div>
 
