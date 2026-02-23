@@ -19,6 +19,13 @@ When a prompt looks docs-related (for example: pydantic-ai, FastAPI, LangChain, 
 Implementation file:
 - `src/lib/docsRag.ts`
 
+### Browser RAG Capabilities
+- Fully client-side (no backend required)
+- Local cache in browser storage with automatic expiration after **3 days**
+- Chunked retrieval context: up to **8 chunks** per answer, ~**900 chars** each
+- Domain-aware crawling for docs sources (PydanticAI, FastAPI, LangChain, LangGraph)
+- If docs relevance is low, the agent automatically falls back to web search route when `Search ON` is enabled
+
 ## Local Setup
 ```bash
 cd v2

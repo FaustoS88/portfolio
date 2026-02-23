@@ -33,6 +33,7 @@ export type DocsContextResult = {
     sourceLabel: string;
     chunkCount: number;
     usedCache: boolean;
+    topScore: number;
 };
 
 const CACHE_VERSION = 'v1';
@@ -42,13 +43,23 @@ const MAX_TEXT_PER_PAGE = 18000;
 const MAX_CONTEXT_CHUNKS = 8;
 const CACHE_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 3;
 
+export const docsRagMeta = {
+    cacheDays: Math.round(CACHE_MAX_AGE_MS / (1000 * 60 * 60 * 24)),
+    maxContextChunks: MAX_CONTEXT_CHUNKS,
+    chunkSize: CHUNK_SIZE
+};
+
 const SOURCES: DocsSource[] = [
     {
         key: 'pydantic-ai',
         label: 'PydanticAI Docs',
         baseUrl: 'https://ai.pydantic.dev',
-        seeds: ['https://ai.pydantic.dev/'],
-        maxPages: 14
+        seeds: [
+            'https://ai.pydantic.dev/',
+            'https://ai.pydantic.dev/examples/',
+            'https://ai.pydantic.dev/examples/weather-agent/'
+        ],
+        maxPages: 26
     },
     {
         key: 'fastapi',
@@ -79,6 +90,12 @@ const tokenize = (text: string): string[] =>
         .replace(/[^a-z0-9\s]/g, ' ')
         .split(/\s+/)
         .filter(token => token.length > 2);
+
+const STOP_WORDS = new Set([
+    'the', 'and', 'for', 'with', 'from', 'that', 'this', 'show', 'make', 'using', 'according',
+    'official', 'ufficial', 'docs', 'documentation', 'please', 'about', 'como', 'come', 'para',
+    'con', 'que', 'how', 'what', 'where', 'when', 'why', 'agent'
+]);
 
 const termFrequency = (tokens: string[]): Record<string, number> => {
     const bag: Record<string, number> = {};
@@ -125,7 +142,8 @@ const fetchHtmlWithProxy = async (url: string): Promise<string> => {
 
 const parsePage = (url: string, html: string) => {
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    const text = (doc.body?.textContent || '')
+    const main = doc.querySelector('main, article, [role="main"], .md-content, .markdown, .content, #content');
+    const text = ((main?.textContent || doc.body?.textContent) || '')
         .replace(/\s+/g, ' ')
         .trim()
         .slice(0, MAX_TEXT_PER_PAGE);
@@ -239,6 +257,10 @@ const scoreChunks = (query: string, chunks: IndexedChunk[]) => {
     if (!queryTokens.length) return [] as Array<{ chunk: IndexedChunk; score: number }>;
 
     const qTerms = termFrequency(queryTokens);
+    const normalizedQuery = query.toLowerCase();
+    const intentTokens = queryTokens.filter(token => !STOP_WORDS.has(token));
+    const weatherIntent = /\bweather\b|\bmeteo\b/.test(normalizedQuery);
+    const pydanticIntent = /pydantic[\s-]?ai|ai\.pydantic\.dev/.test(normalizedQuery);
     const docCount = chunks.length;
     const df: Record<string, number> = {};
     for (const token of Object.keys(qTerms)) {
@@ -259,6 +281,30 @@ const scoreChunks = (query: string, chunks: IndexedChunk[]) => {
 
         const phrase = query.trim().toLowerCase();
         if (phrase.length > 5 && chunk.text.toLowerCase().includes(phrase)) score += 0.25;
+        const lowerUrl = chunk.url.toLowerCase();
+        const lowerText = chunk.text.toLowerCase();
+        const urlTokens = tokenize(lowerUrl.replace(/[/:._-]+/g, ' '));
+        const urlSet = new Set(urlTokens);
+        const headingLike = lowerText.slice(0, 220);
+
+        let urlOverlap = 0;
+        for (const token of intentTokens) {
+            if (urlSet.has(token)) urlOverlap += 1;
+            if (headingLike.includes(token)) score += 0.05;
+        }
+        if (intentTokens.length > 0) {
+            score += (urlOverlap / intentTokens.length) * 0.7;
+        }
+
+        if (weatherIntent && (lowerUrl.includes('weather') || lowerUrl.includes('example') || lowerText.includes('weather agent'))) {
+            score += 0.6;
+        }
+        if (weatherIntent && (lowerText.includes('get_lat_lng') || lowerText.includes('get_weather'))) {
+            score += 0.8;
+        }
+        if (pydanticIntent && lowerUrl.includes('ai.pydantic.dev')) {
+            score += 0.1;
+        }
         return { chunk, score };
     });
 
@@ -314,6 +360,7 @@ export const getDocsContextForQuery = async (query: string, opts: BuildOpts = {}
         context: contextBlocks.join('\n\n---\n\n'),
         sourceLabel: index.label,
         chunkCount: fallback.length,
-        usedCache
+        usedCache,
+        topScore: fallback[0]?.score || 0
     };
 };

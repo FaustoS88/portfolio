@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Terminal as TerminalIcon, Send, Bot, Key, Settings2, Globe, HelpCircle, Maximize2, Minimize2 } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { FAUSTO_AGENT_PROMPT } from '../data/agentPrompt';
-import { getDocsContextForQuery } from '../lib/docsRag';
+import { docsRagMeta, getDocsContextForQuery } from '../lib/docsRag';
 import { uiText, type Lang } from '../data/uiText';
 
 const getInitialMessages = (lang: Lang) => [
@@ -134,14 +134,22 @@ const AgentChat = ({ lang }: AgentChatProps) => {
                 });
             }
 
-            const route = !useWebSearch ? 'base' : (docsContextResult ? 'docs_rag' : 'web_search');
+            const weakDocsConfidence = Boolean(docsContextResult && docsContextResult.topScore < 0.03);
+            if (weakDocsConfidence) {
+                setMessages(prev => [...prev, {
+                    role: 'system',
+                    content: '[Docs-RAG] Low relevance in local docs chunks, falling back to web search route.'
+                }]);
+            }
+
+            const route = !useWebSearch ? 'base' : (docsContextResult && !weakDocsConfidence ? 'docs_rag' : 'web_search');
 
             let response: any;
 
             if (route === 'docs_rag') {
                 setMessages(prev => [...prev, {
                     role: 'system',
-                    content: `[Docs-RAG] Using ${docsContextResult?.sourceLabel} (${docsContextResult?.chunkCount} retrieved chunks${docsContextResult?.usedCache ? ', cached index' : ''}).`
+                    content: `[Docs-RAG] Using ${docsContextResult?.sourceLabel} (${docsContextResult?.chunkCount} retrieved chunks${docsContextResult?.usedCache ? ', cached index' : ''}, top score: ${docsContextResult?.topScore.toFixed(3)}).`
                 }]);
 
                 const ragPrompt = [
@@ -313,6 +321,25 @@ const AgentChat = ({ lang }: AgentChatProps) => {
                         </div>
                     </div>
                 )}
+
+                <div className="px-4 py-2 border-t border-slate-800/60 bg-slate-900/50">
+                    <div className="text-[10px] text-slate-400">
+                        {labels.ragInfo} ({docsRagMeta.maxContextChunks} chunks max, ~{docsRagMeta.chunkSize} chars/chunk)
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                        <span className="text-[10px] text-slate-500">{labels.suggestionsTitle}</span>
+                        {labels.suggestions.map((suggestion, idx) => (
+                            <button
+                                key={idx}
+                                type="button"
+                                onClick={() => setInput(suggestion)}
+                                className="px-2 py-1 rounded border border-slate-700 text-[10px] text-slate-300 hover:bg-slate-800 transition-colors text-left"
+                            >
+                                {suggestion}
+                            </button>
+                        ))}
+                    </div>
+                </div>
             </div>
 
             {/* Chat Area */}

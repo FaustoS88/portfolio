@@ -24,6 +24,11 @@ From `v2/`:
 
 Detailed implementation notes are in `v2/README.md`.
 
+### Browser Docs-RAG (V2)
+- Client-side docs retrieval and indexing (no backend required)
+- Cached in browser for 3 days
+- Uses chunk retrieval with confidence-based fallback to web search when needed
+
 ### Deployment
 The project is configured for free hosting on GitHub Pages. To deploy updates:
 1. Make your changes inside `v2/src/`.

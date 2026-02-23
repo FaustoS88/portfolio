@@ -41,7 +41,14 @@ export const uiText = {
             saveKey: 'Save Key',
             keyPlaceholder: 'Paste Gemini API Key (Optional)...',
             getFreeKey: 'Get a free API Key on AI Studio →',
-            inputPlaceholder: 'Ask about my tech stack...'
+            inputPlaceholder: 'Ask about my tech stack...',
+            ragInfo: 'Client-side Docs RAG: local crawl + chunk retrieval. Cache: 3 days.',
+            suggestionsTitle: 'Try:',
+            suggestions: [
+                'Search pydantic-ai docs and show how to build a weather agent from the official example.',
+                'Read FastAPI docs and summarize how dependency injection works with a minimal example.',
+                'Read LangGraph docs and explain state + edges in one practical pattern.'
+            ]
         }
     },
     it: {
@@ -83,7 +90,14 @@ export const uiText = {
             saveKey: 'Salva Key',
             keyPlaceholder: 'Incolla Gemini API Key (Opzionale)...',
             getFreeKey: 'Ottieni una API Key gratuita su AI Studio →',
-            inputPlaceholder: 'Chiedi del mio stack tecnico...'
+            inputPlaceholder: 'Chiedi del mio stack tecnico...',
+            ragInfo: 'Docs RAG client-side: crawl locale + recupero chunk. Cache: 3 giorni.',
+            suggestionsTitle: 'Prova:',
+            suggestions: [
+                'Cerca nei docs di pydantic-ai e mostra come costruire un weather agent dall esempio ufficiale.',
+                'Leggi i docs di FastAPI e riassumi come funziona la dependency injection con un esempio minimo.',
+                'Leggi i docs di LangGraph e spiega stato + edge in un pattern pratico.'
+            ]
         }
     },
     es: {
@@ -125,7 +139,14 @@ export const uiText = {
             saveKey: 'Guardar Key',
             keyPlaceholder: 'Pega Gemini API Key (Opcional)...',
             getFreeKey: 'Obtener API Key gratis en AI Studio →',
-            inputPlaceholder: 'Pregunta por mi stack tecnico...'
+            inputPlaceholder: 'Pregunta por mi stack tecnico...',
+            ragInfo: 'Docs RAG en cliente: rastreo local + recuperacion de chunks. Cache: 3 dias.',
+            suggestionsTitle: 'Prueba:',
+            suggestions: [
+                'Busca en docs de pydantic-ai y muestra como crear un weather agent desde el ejemplo oficial.',
+                'Lee docs de FastAPI y resume como funciona dependency injection con un ejemplo minimo.',
+                'Lee docs de LangGraph y explica estado + aristas en un patron practico.'
+            ]
         }
     }
 } as const;
