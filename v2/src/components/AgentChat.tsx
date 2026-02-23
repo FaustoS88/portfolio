@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Terminal as TerminalIcon, Send, Bot, Key, Settings2, Globe, HelpCircle } from 'lucide-react';
+import { Terminal as TerminalIcon, Send, Bot, Key, Settings2, Globe, HelpCircle, Maximize2, Minimize2 } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { FAUSTO_AGENT_PROMPT } from '../data/agentPrompt';
 
@@ -22,6 +22,7 @@ const AgentChat = () => {
     const [showKeyInput, setShowKeyInput] = useState(false);
     const [customKey, setCustomKey] = useState(localStorage.getItem('customGeminiKey') || '');
     const [useWebSearch, setUseWebSearch] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
     const chatContainerRef = useRef<HTMLDivElement>(null);
 
     const handleSaveKey = (e: React.FormEvent) => {
@@ -64,21 +65,40 @@ const AgentChat = () => {
             const dynamicAi = new GoogleGenAI({ apiKey: activeKey });
 
             let tools: any = undefined;
-            // Native search often requires the standard flash model instead of flash-lite to return correctly structured grounded responses
             let chosenModel = 'gemini-2.5-flash-lite';
+
             if (useWebSearch) {
-                tools = [{ googleSearch: {} }];
+                // Native search + Our custom client-side "Mock-MCP" scraper
+                tools = [
+                    { googleSearch: {} },
+                    {
+                        functionDeclarations: [{
+                            name: "read_documentation",
+                            description: "Fetches and reads the text content of a specific URL. Use this to read documentation libraries like Pydantic AI, FastAPI, Devin, or StackOverflow. Do NOT use this for normal Google Searches.",
+                            parameters: {
+                                type: "OBJECT",
+                                properties: {
+                                    url: {
+                                        type: "STRING",
+                                        description: "The absolute URL to read (e.g., https://ai.pydantic.dev/)"
+                                    }
+                                },
+                                required: ["url"]
+                            }
+                        }]
+                    }
+                ];
                 chosenModel = 'gemini-2.5-flash';
             }
 
             // Convert local state messages to Gemini prompt format and append new input
-            const historyContents = chatHistory
+            const historyContents: any[] = chatHistory
                 .filter(m => m.role !== 'system')
                 .map(m => ({ role: m.role, parts: [{ text: m.content }] }));
 
             historyContents.push({ role: 'user', parts: [{ text: userInput }] });
 
-            const response = await dynamicAi.models.generateContent({
+            let response = await dynamicAi.models.generateContent({
                 model: chosenModel,
                 contents: historyContents,
                 config: {
@@ -88,8 +108,73 @@ const AgentChat = () => {
                 }
             });
 
+            // Handle Function Calling Iteration
+            if (response.functionCalls && response.functionCalls.length > 0) {
+                const call = response.functionCalls[0];
+                if (call.name === 'read_documentation') {
+                    const targetUrl = (call.args as any).url;
+
+                    // Add tool call to history
+                    historyContents.push({
+                        role: 'model',
+                        parts: [{ functionCall: { name: call.name, args: call.args } }]
+                    });
+
+                    // Update UI to show we are reading a site
+                    setMessages(prev => {
+                        const newMsg = [...prev];
+                        if (newMsg.length > 0 && newMsg[newMsg.length - 1].role === 'user') {
+                            newMsg.push({ role: 'system', content: `[Agent] Currently reading: ${targetUrl}` });
+                        }
+                        return newMsg;
+                    });
+
+                    let scrapedText = "";
+                    try {
+                        // Use allorigins to bypass CORS
+                        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+                        const fetchRes = await fetch(proxyUrl);
+                        if (!fetchRes.ok) throw new Error("Proxy fetch failed");
+
+                        const data = await fetchRes.json();
+
+                        // Extremely basic HTML strip to extract readable text safely client-side
+                        const tempDiv = document.createElement("div");
+                        tempDiv.innerHTML = data.contents;
+                        scrapedText = tempDiv.textContent || tempDiv.innerText || "";
+
+                        // Limit size to prevent token explosion
+                        scrapedText = scrapedText.replace(/\s+/g, ' ').trim().slice(0, 15000);
+
+                        if (!scrapedText) scrapedText = "Error: Page contained no readable text.";
+                    } catch (e: any) {
+                        scrapedText = `Error fetching URL: ${e.message}`;
+                    }
+
+                    // Feed the result back into the model
+                    historyContents.push({
+                        role: 'user', // functionResponse comes from the user context in standard implementations if not strictly using the explicit structure
+                        parts: [{
+                            functionResponse: {
+                                name: call.name,
+                                response: { content: scrapedText }
+                            }
+                        }]
+                    });
+
+                    response = await dynamicAi.models.generateContent({
+                        model: chosenModel,
+                        contents: historyContents,
+                        config: {
+                            systemInstruction: FAUSTO_AGENT_PROMPT,
+                            temperature: 0.2,
+                            tools: tools
+                        }
+                    });
+                }
+            }
+
             if (useWebSearch) {
-                // Grounding responses sometimes bury the text inside the parts array depending on SDK parsing
                 if (response.text) return response.text;
                 if (response.candidates?.[0]?.content?.parts?.[0]?.text) {
                     return response.candidates[0].content.parts[0].text;
@@ -149,7 +234,10 @@ const AgentChat = () => {
     };
 
     return (
-        <div className="w-full max-w-lg mx-auto bg-slate-950/80 backdrop-blur-xl border border-blue-500/20 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(59,130,246,0.15)] flex flex-col h-[400px] min-h-[300px] max-h-[80vh] resize-y relative">
+        <div className={`transition-all duration-300 ease-in-out bg-slate-950/80 backdrop-blur-xl border border-blue-500/20 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(59,130,246,0.15)] flex flex-col ${isExpanded
+            ? 'fixed top-20 bottom-16 left-4 right-4 z-50 lg:left-24 lg:right-24'
+            : 'w-full max-w-lg mx-auto relative h-[400px] min-h-[300px] max-h-[80vh] resize-y'
+            }`}>
 
             {/* Header */}
             <div className="flex flex-col border-b border-slate-800">
@@ -189,6 +277,14 @@ const AgentChat = () => {
                             title="Bring Your Own Keys"
                         >
                             <Settings2 size={14} className="sm:w-4 sm:h-4" />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setIsExpanded(!isExpanded)}
+                            className="p-1 sm:p-1.5 rounded-md text-slate-400 hover:text-blue-400 hover:bg-blue-400/10 transition-colors"
+                            title={isExpanded ? "Minimize Chat" : "Maximize Chat"}
+                        >
+                            {isExpanded ? <Minimize2 size={14} className="sm:w-4 sm:h-4" /> : <Maximize2 size={14} className="sm:w-4 sm:h-4" />}
                         </button>
                     </div>
                 </div>
