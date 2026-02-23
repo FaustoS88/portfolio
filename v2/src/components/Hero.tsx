@@ -15,7 +15,7 @@ const Hero = () => {
 
                 <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6 leading-[1.05]">
                     Architecting <br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 animate-pulse-glow">Autonomous AI</span>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-emerald-400 to-green-400 animate-pulse-glow">Autonomous AI</span>
                 </h1>
 
                 <p className="text-base sm:text-lg md:text-xl text-slate-400 max-w-xl font-light leading-relaxed mb-10">
@@ -41,7 +41,7 @@ const Hero = () => {
             {/* Right side: Interactive Terminal Chat */}
             <div className="w-full md:w-[45%] relative perspective-1000 mt-8 md:mt-0">
                 {/* Background decorative glow for terminal */}
-                <div className="absolute -inset-4 bg-gradient-to-r from-purple-600 to-blue-600 opacity-20 blur-2xl rounded-full z-0 animate-pulse-glow"></div>
+                <div className="absolute -inset-4 bg-gradient-to-r from-emerald-600 to-teal-600 opacity-20 blur-2xl rounded-full z-0 animate-pulse-glow"></div>
                 <div className="relative z-10 transform md:rotate-y-[-5deg] md:rotate-x-[5deg] transition-transform duration-500 hover:rotate-y-0 hover:rotate-x-0">
                     <AgentChat />
                 </div>
