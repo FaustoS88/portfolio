@@ -1,26 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { Terminal as TerminalIcon, Send, Bot, Key, Settings2 } from 'lucide-react';
+import { Terminal as TerminalIcon, Send, Bot, Key, Settings2, Globe } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
-
-const SYSTEM_INSTRUCTION = `
-You are FaustoOS, the autonomous AI assistant for Fausto Saccoccio's 2026 portfolio.
-Your purpose is to answer technical questions from recruiters and engineers about Fausto's background and projects.
-Keep answers concise (1-3 sentences max), confident, and highly technical. Do NOT hallucinate. If unsure, offer his email: faustosaccoccio1988@gmail.com.
-
-ABOUT FAUSTO:
-Self-taught AI Engineer (2+ years) specializing in Python, Pydantic-AI, RAG, and Multi-Agent Orchestration. 
-He builds full-stack production systems (React/TS, FastAPI, PostgreSQL/pgvector, VPS/Docker). 
-His background in Natural Sciences and Financial Markets gives him strong domain intuition. He is located in Barcelona, Spain.
-
-KEY PROJECTS:
-1. Ragnablock / Ragnarok Finance (ragnarok.finance): A production multi-module AI trading platform. He architected the whole system (VPS, Nginx, Docker, strict Auth with JWT/OAuth2). Modules include Mimir (PgVector RAG), RuneForge (Pine Script generator), Valkyrie (Multi-agent scanner), and Heimdall (async alerts).
-2. Pine Script Expert (Pydantic-AI/RAG): An agent crawling TradingView's docs into pgvector to generate Pine Script v6 strategies. Handles complex tool calls.
-3. Gmail Agent (Pydantic-AI): Processes unread starred emails to draft context-aware replies. Avoids duplicates manually managing stars correctly.
-4. Context7 / MultiLanguage RAG Agent (LangGraph): Hybrid graph-aware CLI/Streamlit app supporting routing between simple quick queries and deep step-by-step code generation.
-5. AI Engineer CLI: Terminal-based multi-provider coding assistant using DeepSeek/Claude with MCP integration.
-
-TONE: Professional, technically precise, fast-paced. Emphasize his ability to ship real-world production AI applications at high velocity from scratch.
-`;
+import { FAUSTO_AGENT_PROMPT } from '../data/agentPrompt';
 
 const AgentChat = () => {
     const [messages, setMessages] = useState([
@@ -32,14 +13,35 @@ const AgentChat = () => {
     const [messageCount, setMessageCount] = useState(parseInt(localStorage.getItem('chatMsgCount') || '0'));
     const [showKeyInput, setShowKeyInput] = useState(false);
     const [customKey, setCustomKey] = useState(localStorage.getItem('customGeminiKey') || '');
+    const [braveKey, setBraveKey] = useState(localStorage.getItem('braveApiKey') || '');
+    const [useWebSearch, setUseWebSearch] = useState(false);
     const chatContainerRef = useRef<HTMLDivElement>(null);
 
     const handleSaveKey = (e: React.FormEvent) => {
         e.preventDefault();
         const trimmedKey = customKey.trim();
+        const trimmedBrave = braveKey.trim();
         localStorage.setItem('customGeminiKey', trimmedKey);
+        localStorage.setItem('braveApiKey', trimmedBrave);
         setShowKeyInput(false);
-        setMessages(prev => [...prev, { role: 'system', content: trimmedKey ? 'Custom API key saved! Guest rate limits disabled.' : 'Custom API key removed. Using guest rate limits.' }]);
+        setMessages(prev => [...prev, { role: 'system', content: trimmedKey || trimmedBrave ? 'Custom API keys saved! Guest limits disabled.' : 'Custom API keys removed. Using guest rate limits.' }]);
+    };
+
+    const braveSearch = async (query: string, apiKey: string) => {
+        try {
+            const res = await fetch(`https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Accept-Encoding': 'gzip',
+                    'X-Subscription-Token': apiKey
+                }
+            });
+            if (!res.ok) return "Web search failed. Please verify your Brave Search API Key.";
+            const data = await res.json();
+            return data.web?.results?.map((r: any) => `${r.title}: ${r.description} (${r.url})`).join('\n') || "No results found.";
+        } catch (e) {
+            return `Web search error: ${e}`;
+        }
     };
 
     const scrollToBottom = () => {
@@ -65,15 +67,57 @@ const AgentChat = () => {
 
         try {
             const dynamicAi = new GoogleGenAI({ apiKey: activeKey });
-            // Lightweight one-shot request with system instruction config
+
+            let tools: any = undefined;
+            if (useWebSearch && braveKey.trim()) {
+                tools = [{
+                    functionDeclarations: [{
+                        name: 'searchWeb',
+                        description: 'Search the web using Brave Search API to find real-time information or answer user queries outside your knowledge.',
+                        parameters: {
+                            type: 'OBJECT',
+                            properties: { query: { type: 'STRING', description: 'The search query string.' } },
+                            required: ['query']
+                        }
+                    }]
+                }];
+            }
+
+            // Initial Request
             const response = await dynamicAi.models.generateContent({
                 model: 'gemini-2.5-flash-lite',
                 contents: userInput,
                 config: {
-                    systemInstruction: SYSTEM_INSTRUCTION,
-                    temperature: 0.2
+                    systemInstruction: FAUSTO_AGENT_PROMPT,
+                    temperature: 0.2,
+                    tools: tools
                 }
             });
+
+            // Handle Function Call
+            if (response.functionCalls && response.functionCalls.length > 0) {
+                const call = response.functionCalls[0];
+                if (call.name === 'searchWeb') {
+                    const query = (call.args as any)?.query || userInput;
+                    setMessages(prev => [...prev, { role: 'system', content: `[Agent Output] 🌐 Searching web for: "${query}"...` }]);
+                    const searchResults = await braveSearch(query, braveKey.trim());
+
+                    // Second Request with Function Response
+                    const followUpResponse = await dynamicAi.models.generateContent({
+                        model: 'gemini-2.5-flash-lite',
+                        contents: [
+                            { role: 'user', parts: [{ text: userInput }] },
+                            { role: 'model', parts: [{ functionCall: { name: 'searchWeb', args: call.args } }] },
+                            { role: 'function', parts: [{ functionResponse: { name: 'searchWeb', response: { result: searchResults } } }] }
+                        ],
+                        config: {
+                            systemInstruction: FAUSTO_AGENT_PROMPT,
+                            temperature: 0.2
+                        }
+                    });
+                    return followUpResponse.text || "I was unable to formulate a response to the search.";
+                }
+            }
 
             return response.text || "I was unable to formulate a response.";
         } catch (error: any) {
@@ -142,35 +186,58 @@ const AgentChat = () => {
                             <TerminalIcon size={14} className="text-blue-400" /> pydantic_agent_v3.py (Live)
                         </div>
                     </div>
-                    <button
-                        type="button"
-                        onClick={() => setShowKeyInput(!showKeyInput)}
-                        className={`p-1.5 rounded-md transition-colors ${customKey.trim() ? 'text-emerald-400 bg-emerald-400/10' : 'text-slate-400 hover:text-blue-400 hover:bg-blue-400/10'}`}
-                        title="Bring Your Own Key"
-                    >
-                        <Settings2 size={16} />
-                    </button>
+                    <div className="flex items-center gap-2">
+                        {braveKey.trim() && (
+                            <button
+                                type="button"
+                                onClick={() => setUseWebSearch(!useWebSearch)}
+                                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-colors text-xs font-medium border ${useWebSearch ? 'text-emerald-400 bg-emerald-400/10 border-emerald-500/30' : 'text-slate-500 bg-slate-800/50 border-slate-700/50 hover:text-slate-300'}`}
+                                title="Toggle Web Browsing"
+                            >
+                                <Globe size={14} className={useWebSearch ? 'animate-pulse' : ''} />
+                                <span className="hidden sm:inline">{useWebSearch ? 'Web Search ON' : 'Web Search OFF'}</span>
+                            </button>
+                        )}
+                        <button
+                            type="button"
+                            onClick={() => setShowKeyInput(!showKeyInput)}
+                            className={`p-1.5 rounded-md transition-colors ${customKey.trim() || braveKey.trim() ? 'text-emerald-400 bg-emerald-400/10' : 'text-slate-400 hover:text-blue-400 hover:bg-blue-400/10'}`}
+                            title="Bring Your Own Keys"
+                        >
+                            <Settings2 size={16} />
+                        </button>
+                    </div>
                 </div>
 
                 {/* BYOK Input Area */}
                 {showKeyInput && (
                     <div className="px-4 py-3 bg-slate-900/50 border-t border-slate-800/50 flex flex-col gap-2">
-                        <form onSubmit={handleSaveKey} className="flex gap-2">
+                        <form onSubmit={handleSaveKey} className="flex flex-col sm:flex-row gap-2">
                             <div className="relative flex-1 text-slate-500">
                                 <span className="absolute left-3 top-1/2 -translate-y-1/2"><Key size={14} /></span>
                                 <input
                                     type="password"
                                     value={customKey}
                                     onChange={(e) => setCustomKey(e.target.value)}
-                                    placeholder="Paste Gemini API Key (Optional)..."
+                                    placeholder="Gemini API Key..."
                                     className="w-full bg-slate-950 border border-slate-700 rounded-lg py-1.5 pl-9 pr-3 text-slate-300 font-mono text-xs focus:outline-none focus:border-blue-500/50 placeholder:text-slate-600"
+                                />
+                            </div>
+                            <div className="relative flex-1 text-slate-500">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2"><Globe size={14} /></span>
+                                <input
+                                    type="password"
+                                    value={braveKey}
+                                    onChange={(e) => setBraveKey(e.target.value)}
+                                    placeholder="Brave API Key..."
+                                    className="w-full bg-slate-950 border border-slate-700 rounded-lg py-1.5 pl-9 pr-3 text-slate-300 font-mono text-xs focus:outline-none focus:border-emerald-500/50 placeholder:text-slate-600"
                                 />
                             </div>
                             <button
                                 type="submit"
-                                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-medium transition-colors"
+                                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-medium transition-colors whitespace-nowrap"
                             >
-                                Save
+                                Save Keys
                             </button>
                         </form>
                         <a
