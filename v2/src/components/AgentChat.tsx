@@ -149,7 +149,7 @@ const AgentChat = () => {
     };
 
     return (
-        <div className="w-full max-w-lg mx-auto bg-slate-950/80 backdrop-blur-xl border border-blue-500/20 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(59,130,246,0.15)] flex flex-col h-[400px]">
+        <div className="w-full max-w-lg mx-auto bg-slate-950/80 backdrop-blur-xl border border-blue-500/20 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(59,130,246,0.15)] flex flex-col h-[400px] min-h-[300px] max-h-[80vh] resize-y relative">
 
             {/* Header */}
             <div className="flex flex-col border-b border-slate-800">
