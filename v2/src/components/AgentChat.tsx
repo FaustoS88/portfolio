@@ -88,7 +88,8 @@ const AgentChat = () => {
                         }]
                     }
                 ];
-                chosenModel = 'gemini-2.5-flash';
+                // Upgrade to the Pro model when using Complex Tools/Function Calling to prevent 'Unsupported by model' errors
+                chosenModel = 'gemini-2.5-pro';
             }
 
             // Convert local state messages to Gemini prompt format and append new input
