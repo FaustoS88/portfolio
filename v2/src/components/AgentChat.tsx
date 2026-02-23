@@ -30,6 +30,7 @@ const AgentChat = ({ lang }: AgentChatProps) => {
     const [useWebSearch, setUseWebSearch] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const chatContainerRef = useRef<HTMLDivElement>(null);
+    const isSendingRef = useRef(false);
 
     const handleSaveKey = (e: React.FormEvent) => {
         e.preventDefault();
@@ -196,6 +197,7 @@ const AgentChat = ({ lang }: AgentChatProps) => {
 
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (isSendingRef.current) return;
         if (!input.trim()) return;
 
         const userMessage = input.trim();
@@ -219,11 +221,15 @@ const AgentChat = ({ lang }: AgentChatProps) => {
         const currentHistory = [...messages];
         setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
         setIsTyping(true);
+        isSendingRef.current = true;
 
-        const response = await getAgentResponse(userMessage, currentHistory);
-
-        setMessages(prev => [...prev, { role: 'model', content: response }]);
-        setIsTyping(false);
+        try {
+            const response = await getAgentResponse(userMessage, currentHistory);
+            setMessages(prev => [...prev, { role: 'model', content: response }]);
+        } finally {
+            setIsTyping(false);
+            isSendingRef.current = false;
+        }
     };
 
     const chatContent = (
