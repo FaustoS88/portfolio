@@ -10,7 +10,6 @@ const Projects = () => {
             githubUrl: "https://github.com/FaustoS88/Pydantic-AI-Pinescript-Expert",
             featured: true,
             stats: {
-                commits: "150+",
                 users: "10k+",
                 uptime: "99.9%"
             }
@@ -23,7 +22,6 @@ const Projects = () => {
             githubUrl: "https://github.com/FaustoS88/Pydantic-AI-Gmail-Agent",
             featured: false,
             stats: {
-                commits: "45",
                 emails: "500+/day",
                 saved: "10h/wk"
             }
@@ -36,7 +34,6 @@ const Projects = () => {
             githubUrl: "https://github.com/FaustoS88/SmolAgents-MCPs",
             featured: false,
             stats: {
-                commits: "32",
                 models: "5+",
                 speed: "Fast"
             }
@@ -49,7 +46,6 @@ const Projects = () => {
             githubUrl: "https://github.com/FaustoS88/MultiLanguage-RAG-Agent",
             featured: false,
             stats: {
-                commits: "89",
                 langs: "12",
                 latency: "<200ms"
             }
