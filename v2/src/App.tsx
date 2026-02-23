@@ -1,4 +1,3 @@
-
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Expertise from './components/Expertise';
@@ -7,14 +6,21 @@ import Contact from './components/Contact';
 
 function App() {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 selection:bg-purple-500/30 font-sans overflow-x-hidden relative">
-      {/* Background Blobs */}
-      <div className="fixed top-[-150px] right-[-150px] md:top-[-250px] md:right-[-250px] w-[300px] h-[300px] md:w-[500px] md:h-[500px] rounded-full bg-blue-500/10 blur-[80px] z-0 pointer-events-none" />
-      <div className="fixed bottom-[-150px] left-[-150px] md:bottom-[-250px] md:left-[-250px] w-[300px] h-[300px] md:w-[500px] md:h-[500px] rounded-full bg-purple-500/10 blur-[80px] z-0 pointer-events-none" />
+    <div className="min-h-screen text-slate-200 overflow-x-hidden relative bg-[#050505]">
 
-      <div className="relative z-10 hidden opacity-5 pointer-events-none fixed inset-0 flex items-center justify-center">
-        <img src="/Ai_logo.png" alt="Background" className="max-w-[80vw] max-h-[80vh] object-contain" />
-      </div>
+      {/* Animated Organic Background Shapes */}
+      <div
+        className="animated-bg-shape w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] bg-purple-600/10 top-[-10%] left-[-10%]"
+        style={{ animationDelay: '0s' }}
+      ></div>
+      <div
+        className="animated-bg-shape w-[50vw] h-[50vw] max-w-[800px] max-h-[800px] bg-blue-600/10 bottom-[-20%] right-[-10%]"
+        style={{ animationDelay: '-5s' }}
+      ></div>
+      <div
+        className="animated-bg-shape w-[30vw] h-[30vw] max-w-[400px] max-h-[400px] bg-pink-600/10 top-[40%] right-[10%]"
+        style={{ animationDelay: '-10s' }}
+      ></div>
 
       <Navbar />
 
