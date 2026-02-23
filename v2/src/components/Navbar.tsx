@@ -35,13 +35,13 @@ const Navbar = ({ theme, setTheme, lang, setLang, navText }: NavbarProps) => {
                         <span className={`ml-3 font-semibold text-lg tracking-tight hidden sm:block ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>Fausto Saccoccio</span>
                     </div>
 
-                    <div className="hidden lg:block">
-                        <div className="ml-8 flex items-center space-x-4">
+                    <div className="hidden md:block">
+                        <div className="ml-4 flex items-center space-x-3">
                             {links.map((link) => (
                                 <a
                                     key={link.name}
                                     href={link.href}
-                                    className={`animated-underline px-3 py-2 text-sm font-medium ${theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-900'}`}
+                                    className={`animated-underline px-2 py-2 text-xs font-medium ${theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-900'}`}
                                 >
                                     {link.name}
                                 </a>
@@ -49,14 +49,14 @@ const Navbar = ({ theme, setTheme, lang, setLang, navText }: NavbarProps) => {
                             <button
                                 type="button"
                                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                                className={`px-3 py-1.5 text-xs rounded-lg border ${theme === 'dark' ? 'border-slate-700 text-slate-300 hover:text-white' : 'border-slate-300 text-slate-700 hover:text-slate-900'}`}
+                                className={`px-2 py-1 text-[10px] rounded-lg border ${theme === 'dark' ? 'border-slate-700 text-slate-300 hover:text-white' : 'border-slate-300 text-slate-700 hover:text-slate-900'}`}
                             >
                                 {navText.theme}: {theme === 'dark' ? 'Dark' : 'Light'}
                             </button>
                             <select
                                 value={lang}
                                 onChange={(e) => setLang(e.target.value as Lang)}
-                                className={`px-2 py-1.5 text-xs rounded-lg border bg-transparent ${theme === 'dark' ? 'border-slate-700 text-slate-300' : 'border-slate-300 text-slate-700'}`}
+                                className={`px-1.5 py-1 text-[10px] rounded-lg border bg-transparent ${theme === 'dark' ? 'border-slate-700 text-slate-300' : 'border-slate-300 text-slate-700'}`}
                                 aria-label={navText.language}
                             >
                                 <option value="en">EN</option>
@@ -66,7 +66,7 @@ const Navbar = ({ theme, setTheme, lang, setLang, navText }: NavbarProps) => {
                         </div>
                     </div>
 
-                    <div className="lg:hidden flex items-center">
+                    <div className="md:hidden flex items-center">
                         <button
                             type="button"
                             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
