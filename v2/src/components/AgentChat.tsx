@@ -79,6 +79,7 @@ const AgentChat = ({ lang }: AgentChatProps) => {
 
         try {
             const dynamicAi = new GoogleGenAI({ apiKey: activeKey });
+            const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
             const extractErrorMessage = (error: any): string => {
                 if (typeof error?.message === 'string' && error.message.length > 0) return error.message;
                 if (typeof error?.error?.message === 'string' && error.error.message.length > 0) return error.error.message;
@@ -99,28 +100,58 @@ const AgentChat = ({ lang }: AgentChatProps) => {
                 );
             };
 
+            const shouldRetryTransient = (error: any): boolean => {
+                const message = extractErrorMessage(error).toLowerCase();
+                return (
+                    message.includes('high demand') ||
+                    message.includes('overloaded') ||
+                    message.includes('temporarily unavailable') ||
+                    message.includes('rate limit') ||
+                    message.includes('429') ||
+                    message.includes('503')
+                );
+            };
+
             const runGenerate = async (model: string, tools?: any) => {
-                try {
-                    return await dynamicAi.models.generateContent({
-                        model,
-                        contents: historyContents,
-                        config: {
-                            systemInstruction: FAUSTO_AGENT_PROMPT,
-                            temperature: 0.2,
-                            tools
+                let lastError: any;
+                for (let attempt = 0; attempt < 3; attempt += 1) {
+                    try {
+                        return await dynamicAi.models.generateContent({
+                            model,
+                            contents: historyContents,
+                            config: {
+                                systemInstruction: FAUSTO_AGENT_PROMPT,
+                                temperature: 0.2,
+                                tools
+                            }
+                        });
+                    } catch (error: any) {
+                        lastError = error;
+
+                        if (tools && shouldFallbackNoTools(error)) {
+                            return await dynamicAi.models.generateContent({
+                                model: 'gemini-2.5-flash-lite',
+                                contents: historyContents,
+                                config: {
+                                    systemInstruction: FAUSTO_AGENT_PROMPT,
+                                    temperature: 0.2
+                                }
+                            });
                         }
-                    });
-                } catch (error: any) {
-                    if (!tools || !shouldFallbackNoTools(error)) throw error;
-                    return await dynamicAi.models.generateContent({
-                        model: 'gemini-2.5-flash-lite',
-                        contents: historyContents,
-                        config: {
-                            systemInstruction: FAUSTO_AGENT_PROMPT,
-                            temperature: 0.2
+
+                        if (!shouldRetryTransient(error) || attempt === 2) {
+                            throw error;
                         }
-                    });
+
+                        const backoffMs = 700 * (attempt + 1);
+                        setMessages(prev => [...prev, {
+                            role: 'system',
+                            content: `[Agent] Temporary provider load detected. Retrying in ${backoffMs}ms...`
+                        }]);
+                        await sleep(backoffMs);
+                    }
                 }
+                throw lastError;
             };
 
             // Convert local state messages to Gemini prompt format and append new input
@@ -157,7 +188,11 @@ const AgentChat = ({ lang }: AgentChatProps) => {
                 const ragPrompt = [
                     'You are answering with local documentation retrieval context.',
                     'Use only the retrieved snippets below when stating doc-specific claims.',
-                    'If context is insufficient, say what is missing and suggest enabling Search ON for broader web context.',
+                    'Never invent APIs, imports, decorators, or code not present in the snippets.',
+                    'If user asks for official example/code, output only code and structure found in snippets.',
+                    'Include citations as `Source: <url>` for each major section.',
+                    `Available sources: ${(docsContextResult?.sourceUrls || []).join(', ')}`,
+                    'If context is insufficient, clearly state what is missing and suggest enabling Search ON for broader web context.',
                     '',
                     'Retrieved documentation context:',
                     docsContextResult?.context || ''
@@ -165,7 +200,7 @@ const AgentChat = ({ lang }: AgentChatProps) => {
 
                 historyContents.push({ role: 'user', parts: [{ text: ragPrompt }] });
 
-                response = await runGenerate('gemini-2.5-flash-lite');
+                response = await runGenerate('gemini-2.5-flash');
             } else {
                 const tools = route === 'web_search' ? [{ googleSearch: {} }] : undefined;
                 const model = route === 'web_search' ? 'gemini-2.5-flash' : 'gemini-2.5-flash-lite';

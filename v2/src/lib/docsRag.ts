@@ -34,6 +34,7 @@ export type DocsContextResult = {
     chunkCount: number;
     usedCache: boolean;
     topScore: number;
+    sourceUrls: string[];
 };
 
 const CACHE_VERSION = 'v1';
@@ -143,10 +144,19 @@ const fetchHtmlWithProxy = async (url: string): Promise<string> => {
 const parsePage = (url: string, html: string) => {
     const doc = new DOMParser().parseFromString(html, 'text/html');
     const main = doc.querySelector('main, article, [role="main"], .md-content, .markdown, .content, #content');
-    const text = ((main?.textContent || doc.body?.textContent) || '')
+    const mainNode = main || doc.body;
+    const mainText = (mainNode?.textContent || '')
         .replace(/\s+/g, ' ')
-        .trim()
-        .slice(0, MAX_TEXT_PER_PAGE);
+        .trim();
+    const codeBlocks = Array.from((mainNode || doc).querySelectorAll('pre code, pre'))
+        .map(node => (node.textContent || '').replace(/\s+\n/g, '\n').trim())
+        .filter(Boolean)
+        .slice(0, 8);
+    const mergedText = [
+        mainText,
+        ...codeBlocks.map((block, i) => `CODE_BLOCK_${i + 1}:\n${block}`)
+    ].join('\n\n');
+    const text = mergedText.slice(0, MAX_TEXT_PER_PAGE);
 
     const links = Array.from(doc.querySelectorAll('a[href]'))
         .map(a => a.getAttribute('href') || '')
@@ -251,10 +261,10 @@ const saveCache = (key: string, value: CachedIndex) => {
 };
 
 const scoreChunks = (query: string, chunks: IndexedChunk[]) => {
-    if (!chunks.length) return [] as Array<{ chunk: IndexedChunk; score: number }>;
+    if (!chunks.length) return [] as Array<{ chunk: IndexedChunk; score: number; index: number }>;
 
     const queryTokens = tokenize(query);
-    if (!queryTokens.length) return [] as Array<{ chunk: IndexedChunk; score: number }>;
+    if (!queryTokens.length) return [] as Array<{ chunk: IndexedChunk; score: number; index: number }>;
 
     const qTerms = termFrequency(queryTokens);
     const normalizedQuery = query.toLowerCase();
@@ -270,7 +280,7 @@ const scoreChunks = (query: string, chunks: IndexedChunk[]) => {
         }
     }
 
-    const scored = chunks.map(chunk => {
+    const scored = chunks.map((chunk, index) => {
         let score = 0;
         for (const [token, qTf] of Object.entries(qTerms)) {
             const tf = chunk.terms[token] || 0;
@@ -305,11 +315,36 @@ const scoreChunks = (query: string, chunks: IndexedChunk[]) => {
         if (pydanticIntent && lowerUrl.includes('ai.pydantic.dev')) {
             score += 0.1;
         }
-        return { chunk, score };
+        return { chunk, score, index };
     });
 
     return scored
         .filter(item => item.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, MAX_CONTEXT_CHUNKS);
+};
+
+const expandWithNeighbors = (
+    ranked: Array<{ chunk: IndexedChunk; score: number; index: number }>,
+    chunks: IndexedChunk[]
+): Array<{ chunk: IndexedChunk; score: number; index: number }> => {
+    if (!ranked.length) return [];
+    const seed = ranked.slice(0, Math.min(4, ranked.length));
+    const chosen = new Map<number, { chunk: IndexedChunk; score: number; index: number }>();
+
+    for (const item of seed) {
+        chosen.set(item.index, item);
+        const prev = item.index - 1;
+        const next = item.index + 1;
+        if (prev >= 0 && !chosen.has(prev)) {
+            chosen.set(prev, { chunk: chunks[prev], score: item.score * 0.6, index: prev });
+        }
+        if (next < chunks.length && !chosen.has(next)) {
+            chosen.set(next, { chunk: chunks[next], score: item.score * 0.6, index: next });
+        }
+    }
+
+    return Array.from(chosen.values())
         .sort((a, b) => b.score - a.score)
         .slice(0, MAX_CONTEXT_CHUNKS);
 };
@@ -346,21 +381,25 @@ export const getDocsContextForQuery = async (query: string, opts: BuildOpts = {}
     if (!index.chunks.length) return null;
 
     const ranked = scoreChunks(query, index.chunks);
-    const fallback = ranked.length
-        ? ranked
-        : index.chunks.slice(0, Math.min(MAX_CONTEXT_CHUNKS, index.chunks.length)).map(chunk => ({ chunk, score: 0 }));
+    const selected = ranked.length
+        ? expandWithNeighbors(ranked, index.chunks)
+        : index.chunks
+            .slice(0, Math.min(MAX_CONTEXT_CHUNKS, index.chunks.length))
+            .map((chunk, i) => ({ chunk, score: 0, index: i }));
 
-    const contextBlocks = fallback.map((item, i) => (
+    const contextBlocks = selected.map((item, i) => (
         `Source ${i + 1}: ${item.chunk.url}\n` +
         `Relevance: ${item.score.toFixed(4)}\n` +
         `${item.chunk.text}`
     ));
+    const sourceUrls = Array.from(new Set(selected.map(item => item.chunk.url)));
 
     return {
         context: contextBlocks.join('\n\n---\n\n'),
         sourceLabel: index.label,
-        chunkCount: fallback.length,
+        chunkCount: selected.length,
         usedCache,
-        topScore: fallback[0]?.score || 0
+        topScore: selected[0]?.score || 0,
+        sourceUrls
     };
 };
