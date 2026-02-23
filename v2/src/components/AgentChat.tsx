@@ -33,6 +33,49 @@ const AgentChat = ({ lang }: AgentChatProps) => {
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const isSendingRef = useRef(false);
 
+    const isExactCodeRequest = (text: string): boolean => {
+        const q = text.toLowerCase();
+        return (
+            q.includes('exact code') ||
+            q.includes('official code') ||
+            q.includes('official example') ||
+            q.includes('full code') ||
+            q.includes('verbatim') ||
+            (q.includes('show me') && q.includes('code')) ||
+            (q.includes('example') && q.includes('code'))
+        );
+    };
+
+    const fetchExactCodeFromUrl = async (url: string): Promise<string | null> => {
+        try {
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+            const response = await fetch(proxyUrl);
+            if (!response.ok) return null;
+            const payload = await response.json();
+            const html = payload?.contents || '';
+            if (!html) return null;
+
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            const blocks = Array.from(doc.querySelectorAll('pre code, pre'))
+                .map(node => (node.textContent || '').trim())
+                .filter(Boolean)
+                .filter(text => text.length > 40);
+
+            if (!blocks.length) return null;
+
+            const combined = blocks.slice(0, 4).join('\n\n');
+            return [
+                `Here is the exact code extracted from the official docs page.`,
+                `Source: ${url}`,
+                '```python',
+                combined,
+                '```'
+            ].join('\n');
+        } catch {
+            return null;
+        }
+    };
+
     const handleSaveKey = (e: React.FormEvent) => {
         e.preventDefault();
         const trimmedKey = customKey.trim();
@@ -184,6 +227,12 @@ const AgentChat = ({ lang }: AgentChatProps) => {
                     role: 'system',
                     content: `[Docs-RAG] Using ${docsContextResult?.sourceLabel} (${docsContextResult?.chunkCount} retrieved chunks${docsContextResult?.usedCache ? ', cached index' : ''}, top score: ${docsContextResult?.topScore.toFixed(3)}).`
                 }]);
+
+                if (isExactCodeRequest(userInput) && docsContextResult?.sourceUrls?.length) {
+                    const exactSource = docsContextResult.sourceUrls[0];
+                    const exactCode = await fetchExactCodeFromUrl(exactSource);
+                    if (exactCode) return exactCode;
+                }
 
                 const ragPrompt = [
                     'You are answering with local documentation retrieval context.',
