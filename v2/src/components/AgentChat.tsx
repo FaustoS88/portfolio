@@ -69,25 +69,24 @@ const AgentChat = () => {
 
             if (useWebSearch) {
                 // Native search + Our custom client-side "Mock-MCP" scraper
-                tools = [
-                    { googleSearch: {} },
-                    {
-                        functionDeclarations: [{
-                            name: "read_documentation",
-                            description: "Fetches and reads the text content of a specific URL. Use this to read documentation libraries like Pydantic AI, FastAPI, Devin, or StackOverflow. Do NOT use this for normal Google Searches.",
-                            parameters: {
-                                type: "OBJECT",
-                                properties: {
-                                    url: {
-                                        type: "STRING",
-                                        description: "The absolute URL to read (e.g., https://ai.pydantic.dev/)"
-                                    }
-                                },
-                                required: ["url"]
-                            }
-                        }]
-                    }
-                ];
+                // Both capabilities MUST be nested inside a SINGLE Tool object to avoid API collisions in Gemini.
+                tools = [{
+                    googleSearch: {},
+                    functionDeclarations: [{
+                        name: "read_documentation",
+                        description: "Fetches and reads the text content of a specific URL. Use this to read documentation libraries like Pydantic AI, FastAPI, Devin, or StackOverflow. Do NOT use this for normal Google Searches.",
+                        parameters: {
+                            type: "OBJECT",
+                            properties: {
+                                url: {
+                                    type: "STRING",
+                                    description: "The absolute URL to read (e.g., https://ai.pydantic.dev/)"
+                                }
+                            },
+                            required: ["url"]
+                        }
+                    }]
+                }];
                 // Upgrade to the 3.1 Pro Preview Custom Tools model. The 2.5 models reject payloads mixing native Google Search + Custom Functions.
                 chosenModel = 'gemini-3.1-pro-preview-customtools';
             }
@@ -236,7 +235,7 @@ const AgentChat = () => {
 
     return (
         <div className={`transition-all duration-300 ease-in-out bg-slate-950/80 backdrop-blur-xl border border-blue-500/20 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(59,130,246,0.15)] flex flex-col ${isExpanded
-            ? 'fixed top-20 bottom-16 left-4 right-4 z-50 lg:left-24 lg:right-24'
+            ? 'fixed top-4 bottom-4 left-4 right-4 md:top-12 md:bottom-12 md:left-12 md:right-12 z-[100] h-[calc(100vh-2rem)] md:h-[calc(100vh-6rem)] resize-none'
             : 'w-full max-w-lg mx-auto relative h-[400px] min-h-[300px] max-h-[80vh] resize-y'
             }`}>
 
