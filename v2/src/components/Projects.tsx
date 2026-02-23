@@ -163,7 +163,7 @@ const Projects = ({ lang, theme, text }: ProjectsProps) => {
                         <div className="relative w-full h-full preserve-3d">
 
                             {/* === FRONT FACE === */}
-                            <div className={`absolute inset-0 backface-hidden backdrop-blur-sm rounded-3xl p-6 sm:p-8 flex flex-col hover-lift ${theme === 'dark' ? 'bg-slate-900/40 border border-slate-800' : 'bg-white/90 border border-slate-300 shadow-sm'}`}>
+                            <div className={`absolute inset-0 backface-hidden card-face-front backdrop-blur-sm rounded-3xl p-6 sm:p-8 flex flex-col hover-lift ${theme === 'dark' ? 'bg-slate-900/40 border border-slate-800' : 'bg-white/90 border border-slate-300 shadow-sm'}`}>
                                 {project.featured && (
                                     <div className="absolute -top-4 -right-4 bg-gradient-to-br from-teal-500 to-emerald-600 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/30 animate-pulse-glow z-20">
                                         <Star className="text-white w-6 h-6 sm:w-8 sm:h-8 fill-white" />
@@ -193,7 +193,7 @@ const Projects = ({ lang, theme, text }: ProjectsProps) => {
                             </div>
 
                             {/* === BACK FACE === */}
-                            <div className={`absolute inset-0 backface-hidden rotate-y-180 rounded-3xl p-6 sm:p-8 flex flex-col justify-between ${theme === 'dark' ? 'bg-gradient-to-br from-slate-900 to-slate-950 border border-emerald-500/30 shadow-[0_0_50px_rgba(16,185,129,0.15)]' : 'bg-gradient-to-br from-white to-slate-100 border border-emerald-300/60 shadow-[0_0_30px_rgba(16,185,129,0.08)]'}`}>
+                            <div className={`absolute inset-0 backface-hidden card-face-back rounded-3xl p-6 sm:p-8 flex flex-col justify-between ${theme === 'dark' ? 'bg-gradient-to-br from-slate-900 to-slate-950 border border-emerald-500/30 shadow-[0_0_50px_rgba(16,185,129,0.15)]' : 'bg-gradient-to-br from-white to-slate-100 border border-emerald-300/60 shadow-[0_0_30px_rgba(16,185,129,0.08)]'}`}>
 
                                 <div>
                                     <h4 className={`text-lg sm:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-emerald-400 mb-4 sm:mb-6 pb-3 sm:pb-4 ${theme === 'dark' ? 'border-b border-slate-800' : 'border-b border-slate-300'}`}>

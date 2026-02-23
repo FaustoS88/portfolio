@@ -35,12 +35,16 @@ body {
 /* The scene establishing 3D perspective */
 .perspective-1000 {
   perspective: 1000px;
+  -webkit-perspective: 1000px;
+  perspective-origin: center;
 }
 
 /* The card container that rotates */
 .preserve-3d {
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
   transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  will-change: transform;
 }
 
 /* Hover state triggers the flip */
@@ -54,8 +58,26 @@ body {
   -webkit-backface-visibility: hidden;
 }
 
-.rotate-y-180 {
+.card-face-front {
+  transform: rotateY(0deg) translateZ(1px);
+  -webkit-transform: rotateY(0deg) translateZ(1px);
+}
+
+.card-face-back {
   transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg) translateZ(1px);
+}
+
+/* Touch devices often render CSS 3D flips inconsistently (mirrored text),
+   so fall back to front-only cards there. */
+@media (hover: none), (pointer: coarse) {
+  .group:hover .preserve-3d {
+    transform: none;
+  }
+
+  .card-face-back {
+    display: none;
+  }
 }
 
 /* =========================================
