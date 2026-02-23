@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Terminal as TerminalIcon, Send, Bot, Key, Settings2, Globe, HelpCircle, Maximize2, Minimize2 } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { FAUSTO_AGENT_PROMPT } from '../data/agentPrompt';
@@ -235,9 +236,9 @@ const AgentChat = () => {
         setIsTyping(false);
     };
 
-    return (
-        <div className={`transition-all duration-300 ease-in-out bg-slate-950/80 backdrop-blur-xl border border-blue-500/20 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(59,130,246,0.15)] flex flex-col ${isExpanded
-            ? 'fixed top-4 bottom-4 left-4 right-4 md:top-12 md:bottom-12 md:left-12 md:right-12 z-[100] h-[calc(100vh-2rem)] md:h-[calc(100vh-6rem)] w-auto max-w-none resize-none'
+    const chatContent = (
+        <div className={`transition-all duration-300 ease-in-out bg-slate-950/95 backdrop-blur-xl border border-blue-500/30 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(59,130,246,0.15)] flex flex-col ${isExpanded
+            ? 'fixed inset-4 md:inset-12 z-[9999] h-[calc(100vh-2rem)] md:h-[calc(100vh-6rem)] w-[calc(100vw-2rem)] md:w-[calc(100vw-6rem)] max-w-none resize-none'
             : 'w-full max-w-lg mx-auto relative h-[400px] min-h-[300px] max-h-[80vh] resize-y'
             }`}>
 
@@ -403,6 +404,18 @@ const AgentChat = () => {
 
         </div>
     );
+
+    // If expanded, break out of the DOM hierarchy completely to avoid CSS transform/relative parent trapping
+    if (isExpanded) {
+        return createPortal(
+            <div className="fixed inset-0 z-[9990] bg-slate-950/80 backdrop-blur-sm">
+                {chatContent}
+            </div>,
+            document.body
+        );
+    }
+
+    return chatContent;
 }
 
 export default AgentChat;
