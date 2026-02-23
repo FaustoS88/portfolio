@@ -114,10 +114,10 @@ const AgentChat = ({ lang }: AgentChatProps) => {
     }, [lang]);
 
     const getAgentResponse = async (userInput: string, chatHistory: any[]) => {
-        const activeKey = customKey.trim() || import.meta.env.VITE_GEMINI_API_KEY;
+        const activeKey = customKey.trim();
 
         if (!activeKey) {
-            return "FaustoOS is currently in offline demo mode. Please click the Settings/Gear icon above to provide your own Gemini API key and activate the agent safely, or reach out to Fausto directly via email at faustosaccoccio1988@gmail.com!";
+            return "FaustoOS is currently in BYOK mode. Click the Settings/Gear icon and provide your Gemini API key to activate the assistant, or reach out to Fausto at faustosaccoccio1988@gmail.com.";
         }
 
         try {
