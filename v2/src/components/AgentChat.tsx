@@ -237,7 +237,7 @@ const AgentChat = () => {
 
     return (
         <div className={`transition-all duration-300 ease-in-out bg-slate-950/80 backdrop-blur-xl border border-blue-500/20 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(59,130,246,0.15)] flex flex-col ${isExpanded
-            ? 'fixed top-4 bottom-4 left-4 right-4 md:top-12 md:bottom-12 md:left-12 md:right-12 z-[100] h-[calc(100vh-2rem)] md:h-[calc(100vh-6rem)] resize-none'
+            ? 'fixed top-4 bottom-4 left-4 right-4 md:top-12 md:bottom-12 md:left-12 md:right-12 z-[100] h-[calc(100vh-2rem)] md:h-[calc(100vh-6rem)] w-auto max-w-none resize-none'
             : 'w-full max-w-lg mx-auto relative h-[400px] min-h-[300px] max-h-[80vh] resize-y'
             }`}>
 
