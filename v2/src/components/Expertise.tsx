@@ -21,14 +21,14 @@ const Expertise = () => {
                     </p>
                     <div className="flex flex-wrap gap-2">
                         <span className="px-2 sm:px-3 py-1 bg-blue-900/30 text-blue-400 rounded-full text-xs sm:text-sm">Pydantic-AI</span>
-                        <span className="px-2 sm:px-3 py-1 bg-purple-900/30 text-purple-400 rounded-full text-xs sm:text-sm">LangGraph</span>
+                        <span className="px-2 sm:px-3 py-1 bg-emerald-900/30 text-emerald-400 rounded-full text-xs sm:text-sm">LangGraph</span>
                         <span className="px-2 sm:px-3 py-1 bg-green-900/30 text-green-400 rounded-full text-xs sm:text-sm">RAG</span>
-                        <span className="px-2 sm:px-3 py-1 bg-pink-900/30 text-pink-400 rounded-full text-xs sm:text-sm">MCP-Servers</span>
+                        <span className="px-2 sm:px-3 py-1 bg-teal-900/30 text-teal-400 rounded-full text-xs sm:text-sm">MCP-Servers</span>
                     </div>
                 </div>
 
                 <div className="glow-card bg-slate-800/50 rounded-xl p-6 sm:p-8 border border-slate-700">
-                    <div className="text-purple-400 text-3xl sm:text-4xl mb-4 sm:mb-6">
+                    <div className="text-emerald-400 text-3xl sm:text-4xl mb-4 sm:mb-6">
                         <i className="fas fa-layer-group"></i>
                     </div>
                     <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Full Stack Development</h3>
@@ -40,12 +40,12 @@ const Expertise = () => {
                         <span className="px-2 sm:px-3 py-1 bg-blue-900/30 text-blue-400 rounded-full text-xs sm:text-sm">TypeScript-React</span>
                         <span className="px-2 sm:px-3 py-1 bg-green-900/30 text-green-400 rounded-full text-xs sm:text-sm">Node.js</span>
                         <span className="px-2 sm:px-3 py-1 bg-yellow-900/30 text-yellow-400 rounded-full text-xs sm:text-sm">Python</span>
-                        <span className="px-2 sm:px-3 py-1 bg-purple-900/30 text-purple-400 rounded-full text-xs sm:text-sm">Vector-DB</span>
+                        <span className="px-2 sm:px-3 py-1 bg-emerald-900/30 text-emerald-400 rounded-full text-xs sm:text-sm">Vector-DB</span>
                     </div>
                 </div>
 
                 <div className="glow-card bg-slate-800/50 rounded-xl p-6 sm:p-8 border border-slate-700">
-                    <div className="text-pink-400 text-3xl sm:text-4xl mb-4 sm:mb-6">
+                    <div className="text-teal-400 text-3xl sm:text-4xl mb-4 sm:mb-6">
                         <i className="fas fa-cogs"></i>
                     </div>
                     <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Custom AI Solutions</h3>
@@ -54,8 +54,8 @@ const Expertise = () => {
                     </p>
                     <div className="flex flex-wrap gap-2">
                         <span className="px-2 sm:px-3 py-1 bg-blue-900/30 text-blue-400 rounded-full text-xs sm:text-sm">Hybrid LLM Integration</span>
-                        <span className="px-2 sm:px-3 py-1 bg-pink-900/30 text-pink-400 rounded-full text-xs sm:text-sm">Custom Workflows</span>
-                        <span className="px-2 sm:px-3 py-1 bg-purple-900/30 text-purple-400 rounded-full text-xs sm:text-sm">Fine-tuning</span>
+                        <span className="px-2 sm:px-3 py-1 bg-teal-900/30 text-teal-400 rounded-full text-xs sm:text-sm">Custom Workflows</span>
+                        <span className="px-2 sm:px-3 py-1 bg-emerald-900/30 text-emerald-400 rounded-full text-xs sm:text-sm">Fine-tuning</span>
                         <span className="px-2 sm:px-3 py-1 bg-green-900/30 text-green-400 rounded-full text-xs sm:text-sm">Agent Orchestration</span>
                     </div>
                 </div>
@@ -71,13 +71,13 @@ const Expertise = () => {
                     </div>
                     <div className="tech-icon text-4xl sm:text-5xl text-blue-500" title="React"><i className="fab fa-react"></i></div>
                     <div className="tech-icon text-4xl sm:text-5xl border border-white/20 rounded p-1" title="Pydantic-AI">
-                        <img src="/portfolio/Ai_logo.png" alt="Pydantic-AI" className="h-8 sm:h-10" />
+                        <img src="/portfolio/images/Ai_logo.png" alt="Pydantic-AI" className="h-8 sm:h-10" />
                     </div>
                     <div className="tech-icon text-4xl sm:text-5xl" title="DeepSeek">
-                        <img src="/portfolio/deepseek-color.ico" alt="DeepSeek" className="h-8 sm:h-10" />
+                        <img src="/portfolio/images/deepseek-color.ico" alt="DeepSeek" className="h-8 sm:h-10" />
                     </div>
                     <div className="tech-icon text-4xl sm:text-5xl" title="GitHub">
-                        <img src="/portfolio/github.ico" alt="GitHub" className="h-8 sm:h-10" />
+                        <img src="/portfolio/images/github.ico" alt="GitHub" className="h-8 sm:h-10" />
                     </div>
                 </div>
             </div>

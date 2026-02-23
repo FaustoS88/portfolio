@@ -15,7 +15,7 @@ const Navbar = () => {
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16 items-center">
                     <div className="flex-shrink-0 flex items-center">
-                        <img src="/portfolio/Ai_logo.png" alt="Fausto Saccoccio" className="h-8 w-auto opacity-100" />
+                        <img src="/portfolio/images/Ai_logo.png" alt="Fausto Saccoccio" className="h-8 w-auto opacity-100" />
                         <span className="ml-3 font-semibold text-lg tracking-tight text-white hidden sm:block">Fausto Saccoccio</span>
                     </div>
 

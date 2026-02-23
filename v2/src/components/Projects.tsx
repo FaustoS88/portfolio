@@ -71,7 +71,7 @@ const Projects = () => {
                             {/* === FRONT FACE === */}
                             <div className="absolute inset-0 backface-hidden bg-slate-900/40 backdrop-blur-sm border border-slate-800 rounded-3xl p-6 sm:p-8 flex flex-col hover-lift">
                                 {project.featured && (
-                                    <div className="absolute -top-4 -right-4 bg-gradient-to-br from-blue-500 to-purple-600 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center shadow-lg shadow-purple-500/30 animate-pulse-glow z-20">
+                                    <div className="absolute -top-4 -right-4 bg-gradient-to-br from-teal-500 to-emerald-600 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/30 animate-pulse-glow z-20">
                                         <Star className="text-white w-6 h-6 sm:w-8 sm:h-8 fill-white" />
                                     </div>
                                 )}
@@ -99,10 +99,10 @@ const Projects = () => {
                             </div>
 
                             {/* === BACK FACE === */}
-                            <div className="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-br from-slate-900 to-slate-950 border border-purple-500/30 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-[0_0_50px_rgba(168,85,247,0.15)]">
+                            <div className="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-br from-slate-900 to-slate-950 border border-emerald-500/30 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-[0_0_50px_rgba(16,185,129,0.15)]">
 
                                 <div>
-                                    <h4 className="text-lg sm:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-4 sm:mb-6 border-b border-slate-800 pb-3 sm:pb-4">
+                                    <h4 className="text-lg sm:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-emerald-400 mb-4 sm:mb-6 border-b border-slate-800 pb-3 sm:pb-4">
                                         Technical Specifications
                                     </h4>
 
@@ -123,7 +123,7 @@ const Projects = () => {
 
                                     <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                         {project.tags.map(tag => (
-                                            <span key={tag} className="px-2 py-1 text-[10px] sm:text-xs font-medium rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                                            <span key={tag} className="px-2 py-1 text-[10px] sm:text-xs font-medium rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
                                                 {tag}
                                             </span>
                                         ))}

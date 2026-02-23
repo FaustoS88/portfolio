@@ -6,11 +6,11 @@ const Contact = () => {
             <div className="glass-card max-w-4xl mx-auto rounded-3xl p-8 md:p-12 relative overflow-hidden">
                 {/* Decorative background glow inside the card */}
                 <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-500/20 blur-[60px] rounded-full pointer-events-none"></div>
-                <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-pink-500/20 blur-[60px] rounded-full pointer-events-none"></div>
+                <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-teal-500/20 blur-[60px] rounded-full pointer-events-none"></div>
 
                 <div className="relative z-10 text-center">
                     <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white">
-                        Let's build something <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">extraordinary.</span>
+                        Let's build something <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-emerald-400">extraordinary.</span>
                     </h2>
 
                     <p className="text-slate-400 text-lg max-w-2xl mx-auto mb-10">
