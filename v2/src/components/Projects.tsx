@@ -27,8 +27,10 @@ const Projects = ({ lang, theme, text }: ProjectsProps) => {
             githubUrl: "https://github.com/FaustoS88/Pydantic-AI-Pinescript-Expert",
             featured: true,
             stats: {
-                users: "10k+",
-                uptime: "99.9%"
+                language: "Python",
+                forks: "16",
+                "open issues": "0",
+                updated: "2026-02-22"
             }
         },
         {
@@ -39,8 +41,10 @@ const Projects = ({ lang, theme, text }: ProjectsProps) => {
             githubUrl: "https://github.com/FaustoS88/Pydantic-AI-Gmail-Agent",
             featured: false,
             stats: {
-                emails: "500+/day",
-                saved: "10h/wk"
+                language: "Python",
+                forks: "1",
+                "open issues": "1",
+                updated: "2026-01-01"
             }
         },
         {
@@ -51,8 +55,10 @@ const Projects = ({ lang, theme, text }: ProjectsProps) => {
             githubUrl: "https://github.com/FaustoS88/SmolAgents-MCPs",
             featured: false,
             stats: {
-                models: "5+",
-                speed: "Fast"
+                language: "Python",
+                forks: "1",
+                "open issues": "0",
+                updated: "2025-12-14"
             }
         },
         {
@@ -63,8 +69,10 @@ const Projects = ({ lang, theme, text }: ProjectsProps) => {
             githubUrl: "https://github.com/FaustoS88/MultiLanguage-RAG-Agent",
             featured: false,
             stats: {
-                langs: "12",
-                latency: "<200ms"
+                language: "Python",
+                forks: "1",
+                "open issues": "0",
+                updated: "2025-05-20"
             }
         }
         ],
@@ -76,7 +84,7 @@ const Projects = ({ lang, theme, text }: ProjectsProps) => {
                 tags: ["Python", "Pydantic-AI", "RAG", "pgvector", "Streamlit"],
                 githubUrl: "https://github.com/FaustoS88/Pydantic-AI-Pinescript-Expert",
                 featured: true,
-                stats: { users: "10k+", uptime: "99.9%" }
+                stats: { language: "Python", forks: "16", "open issues": "0", updated: "2026-02-22" }
             },
             {
                 title: "Pydantic-AI-Gmail-Agent",
@@ -85,7 +93,7 @@ const Projects = ({ lang, theme, text }: ProjectsProps) => {
                 tags: ["Python", "Pydantic-AI", "Gmail API", "Automation"],
                 githubUrl: "https://github.com/FaustoS88/Pydantic-AI-Gmail-Agent",
                 featured: false,
-                stats: { emails: "500+/day", saved: "10h/wk" }
+                stats: { language: "Python", forks: "1", "open issues": "1", updated: "2026-01-01" }
             },
             {
                 title: "SmolAgents-MCPs",
@@ -94,7 +102,7 @@ const Projects = ({ lang, theme, text }: ProjectsProps) => {
                 tags: ["Python", "SmolAgents", "MCP", "Crawl4ai"],
                 githubUrl: "https://github.com/FaustoS88/SmolAgents-MCPs",
                 featured: false,
-                stats: { models: "5+", speed: "Fast" }
+                stats: { language: "Python", forks: "1", "open issues": "0", updated: "2025-12-14" }
             },
             {
                 title: "MultiLanguage-RAG-Agent",
@@ -103,7 +111,7 @@ const Projects = ({ lang, theme, text }: ProjectsProps) => {
                 tags: ["Python", "RAG", "Crawl4ai", "Vector DB"],
                 githubUrl: "https://github.com/FaustoS88/MultiLanguage-RAG-Agent",
                 featured: false,
-                stats: { langs: "12", latency: "<200ms" }
+                stats: { language: "Python", forks: "1", "open issues": "0", updated: "2025-05-20" }
             }
         ],
         es: [
@@ -114,7 +122,7 @@ const Projects = ({ lang, theme, text }: ProjectsProps) => {
                 tags: ["Python", "Pydantic-AI", "RAG", "pgvector", "Streamlit"],
                 githubUrl: "https://github.com/FaustoS88/Pydantic-AI-Pinescript-Expert",
                 featured: true,
-                stats: { users: "10k+", uptime: "99.9%" }
+                stats: { language: "Python", forks: "16", "open issues": "0", updated: "2026-02-22" }
             },
             {
                 title: "Pydantic-AI-Gmail-Agent",
@@ -123,7 +131,7 @@ const Projects = ({ lang, theme, text }: ProjectsProps) => {
                 tags: ["Python", "Pydantic-AI", "Gmail API", "Automation"],
                 githubUrl: "https://github.com/FaustoS88/Pydantic-AI-Gmail-Agent",
                 featured: false,
-                stats: { emails: "500+/day", saved: "10h/wk" }
+                stats: { language: "Python", forks: "1", "open issues": "1", updated: "2026-01-01" }
             },
             {
                 title: "SmolAgents-MCPs",
@@ -132,7 +140,7 @@ const Projects = ({ lang, theme, text }: ProjectsProps) => {
                 tags: ["Python", "SmolAgents", "MCP", "Crawl4ai"],
                 githubUrl: "https://github.com/FaustoS88/SmolAgents-MCPs",
                 featured: false,
-                stats: { models: "5+", speed: "Fast" }
+                stats: { language: "Python", forks: "1", "open issues": "0", updated: "2025-12-14" }
             },
             {
                 title: "MultiLanguage-RAG-Agent",
@@ -141,7 +149,7 @@ const Projects = ({ lang, theme, text }: ProjectsProps) => {
                 tags: ["Python", "RAG", "Crawl4ai", "Vector DB"],
                 githubUrl: "https://github.com/FaustoS88/MultiLanguage-RAG-Agent",
                 featured: false,
-                stats: { langs: "12", latency: "<200ms" }
+                stats: { language: "Python", forks: "1", "open issues": "0", updated: "2025-05-20" }
             }
         ]
     } as const;
