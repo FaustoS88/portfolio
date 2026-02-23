@@ -69,29 +69,9 @@ const AgentChat = () => {
             let chosenModel = 'gemini-2.5-flash-lite';
 
             if (useWebSearch) {
-                // Native search + Our custom client-side "Mock-MCP" scraper
-                // These must be distinct objects within the tools array per Gemini API Specs
-                tools = [
-                    { googleSearch: {} },
-                    {
-                        functionDeclarations: [{
-                            name: "read_documentation",
-                            description: "Fetches and reads the text content of a specific URL. Use this to read documentation libraries like Pydantic AI, FastAPI, Devin, or StackOverflow. Do NOT use this for normal Google Searches.",
-                            parameters: {
-                                type: "OBJECT",
-                                properties: {
-                                    url: {
-                                        type: "STRING",
-                                        description: "The absolute URL to read (e.g., https://ai.pydantic.dev/)"
-                                    }
-                                },
-                                required: ["url"]
-                            }
-                        }]
-                    }
-                ];
-                // Upgrade to the 3.1 Pro Preview Custom Tools model.
-                chosenModel = 'gemini-3.1-pro-preview-customtools';
+                // Use only native Google Search to avoid brittle preview custom-tool behavior.
+                tools = [{ googleSearch: {} }];
+                chosenModel = 'gemini-2.5-flash';
             }
 
             // Convert local state messages to Gemini prompt format and append new input
@@ -101,80 +81,38 @@ const AgentChat = () => {
 
             historyContents.push({ role: 'user', parts: [{ text: userInput }] });
 
-            let response = await dynamicAi.models.generateContent({
-                model: chosenModel,
-                contents: historyContents,
-                config: {
-                    systemInstruction: FAUSTO_AGENT_PROMPT,
-                    temperature: 0.2,
-                    tools: tools
-                }
-            });
-
-            // Handle Function Calling Iteration
-            if (response.functionCalls && response.functionCalls.length > 0) {
-                const call = response.functionCalls[0];
-                if (call.name === 'read_documentation') {
-                    const targetUrl = (call.args as any).url;
-
-                    // Add tool call to history
-                    historyContents.push({
-                        role: 'model',
-                        parts: [{ functionCall: { name: call.name, args: call.args } }]
-                    });
-
-                    // Update UI to show we are reading a site
-                    setMessages(prev => {
-                        const newMsg = [...prev];
-                        if (newMsg.length > 0 && newMsg[newMsg.length - 1].role === 'user') {
-                            newMsg.push({ role: 'system', content: `[Agent] Currently reading: ${targetUrl}` });
-                        }
-                        return newMsg;
-                    });
-
-                    let scrapedText = "";
-                    try {
-                        // Use allorigins to bypass CORS
-                        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
-                        const fetchRes = await fetch(proxyUrl);
-                        if (!fetchRes.ok) throw new Error("Proxy fetch failed");
-
-                        const data = await fetchRes.json();
-
-                        // Extremely basic HTML strip to extract readable text safely client-side
-                        const tempDiv = document.createElement("div");
-                        tempDiv.innerHTML = data.contents;
-                        scrapedText = tempDiv.textContent || tempDiv.innerText || "";
-
-                        // Limit size to prevent token explosion
-                        scrapedText = scrapedText.replace(/\s+/g, ' ').trim().slice(0, 15000);
-
-                        if (!scrapedText) scrapedText = "Error: Page contained no readable text.";
-                    } catch (e: any) {
-                        scrapedText = `Error fetching URL: ${e.message}`;
+            let response;
+            try {
+                response = await dynamicAi.models.generateContent({
+                    model: chosenModel,
+                    contents: historyContents,
+                    config: {
+                        systemInstruction: FAUSTO_AGENT_PROMPT,
+                        temperature: 0.2,
+                        tools: tools
                     }
+                });
+            } catch (primaryError: any) {
+                const message = primaryError?.message || '';
+                const unsupportedTooling =
+                    message.includes('Tool use with function calling is unsupported by the model') ||
+                    message.includes('function_calling_config');
+                const unknownModel =
+                    message.includes('not found for API version') ||
+                    message.includes('is not found');
 
-                    // Feed the result back into the model
-                    historyContents.push({
-                        role: 'user', // functionResponse comes from the user context in standard implementations if not strictly using the explicit structure
-                        parts: [{
-                            functionResponse: {
-                                name: call.name,
-                                response: { content: scrapedText }
-                            }
-                        }]
-                    });
-
-                    response = await dynamicAi.models.generateContent({
-                        model: chosenModel,
-                        contents: historyContents,
-                        config: {
-                            systemInstruction: FAUSTO_AGENT_PROMPT,
-                            temperature: 0.2,
-                            tools: tools
-                        }
-                    });
+                if (!unsupportedTooling && !unknownModel) {
+                    throw primaryError;
                 }
+
+                response = await dynamicAi.models.generateContent({
+                    model: 'gemini-2.5-flash-lite',
+                    contents: historyContents,
+                    config: {
+                        systemInstruction: FAUSTO_AGENT_PROMPT,
+                        temperature: 0.2
+                    }
+                });
             }
 
             if (useWebSearch) {
