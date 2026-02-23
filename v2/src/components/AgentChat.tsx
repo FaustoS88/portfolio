@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Terminal as TerminalIcon, Send, Bot, Key, Settings2, Globe, HelpCircle, Maximize2, Minimize2 } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { FAUSTO_AGENT_PROMPT } from '../data/agentPrompt';
+import { getDocsContextForQuery } from '../lib/docsRag';
 
 const INITIAL_MESSAGES = [
     { role: 'system', content: 'Connection established to FaustoOS v2.0... (Powered by Gemini 3.1 Pro)' },
@@ -64,46 +65,39 @@ const AgentChat = () => {
 
         try {
             const dynamicAi = new GoogleGenAI({ apiKey: activeKey });
-
-            let tools: any = undefined;
-            let chosenModel = 'gemini-2.5-flash-lite';
-
-            if (useWebSearch) {
-                // Use only native Google Search to avoid brittle preview custom-tool behavior.
-                tools = [{ googleSearch: {} }];
-                chosenModel = 'gemini-2.5-flash';
-            }
-
             // Convert local state messages to Gemini prompt format and append new input
             const historyContents: any[] = chatHistory
                 .filter(m => m.role !== 'system')
                 .map(m => ({ role: m.role, parts: [{ text: m.content }] }));
 
             historyContents.push({ role: 'user', parts: [{ text: userInput }] });
-
-            let response;
-            try {
-                response = await dynamicAi.models.generateContent({
-                    model: chosenModel,
-                    contents: historyContents,
-                    config: {
-                        systemInstruction: FAUSTO_AGENT_PROMPT,
-                        temperature: 0.2,
-                        tools: tools
-                    }
+            let docsContextResult: Awaited<ReturnType<typeof getDocsContextForQuery>> = null;
+            if (useWebSearch) {
+                docsContextResult = await getDocsContextForQuery(userInput, {
+                    onStatus: (message) => setMessages(prev => [...prev, { role: 'system', content: message }])
                 });
-            } catch (primaryError: any) {
-                const message = primaryError?.message || '';
-                const unsupportedTooling =
-                    message.includes('Tool use with function calling is unsupported by the model') ||
-                    message.includes('function_calling_config');
-                const unknownModel =
-                    message.includes('not found for API version') ||
-                    message.includes('is not found');
+            }
 
-                if (!unsupportedTooling && !unknownModel) {
-                    throw primaryError;
-                }
+            const route = !useWebSearch ? 'base' : (docsContextResult ? 'docs_rag' : 'web_search');
+
+            let response: any;
+
+            if (route === 'docs_rag') {
+                setMessages(prev => [...prev, {
+                    role: 'system',
+                    content: `[Docs-RAG] Using ${docsContextResult?.sourceLabel} (${docsContextResult?.chunkCount} retrieved chunks${docsContextResult?.usedCache ? ', cached index' : ''}).`
+                }]);
+
+                const ragPrompt = [
+                    'You are answering with local documentation retrieval context.',
+                    'Use only the retrieved snippets below when stating doc-specific claims.',
+                    'If context is insufficient, say what is missing and suggest enabling Search ON for broader web context.',
+                    '',
+                    'Retrieved documentation context:',
+                    docsContextResult?.context || ''
+                ].join('\n');
+
+                historyContents.push({ role: 'user', parts: [{ text: ragPrompt }] });
 
                 response = await dynamicAi.models.generateContent({
                     model: 'gemini-2.5-flash-lite',
@@ -113,16 +107,47 @@ const AgentChat = () => {
                         temperature: 0.2
                     }
                 });
-            }
+            } else {
+                const tools = route === 'web_search' ? [{ googleSearch: {} }] : undefined;
+                const model = route === 'web_search' ? 'gemini-2.5-flash' : 'gemini-2.5-flash-lite';
 
-            if (useWebSearch) {
-                if (response.text) return response.text;
-                if (response.candidates?.[0]?.content?.parts?.[0]?.text) {
-                    return response.candidates[0].content.parts[0].text;
+                try {
+                    response = await dynamicAi.models.generateContent({
+                        model,
+                        contents: historyContents,
+                        config: {
+                            systemInstruction: FAUSTO_AGENT_PROMPT,
+                            temperature: 0.2,
+                            tools
+                        }
+                    });
+                } catch (primaryError: any) {
+                    const message = primaryError?.message || '';
+                    const unsupportedTooling =
+                        message.includes('Tool use with function calling is unsupported by the model') ||
+                        message.includes('function_calling_config');
+                    const unknownModel =
+                        message.includes('not found for API version') ||
+                        message.includes('is not found');
+
+                    if (!unsupportedTooling && !unknownModel) throw primaryError;
+
+                    response = await dynamicAi.models.generateContent({
+                        model: 'gemini-2.5-flash-lite',
+                        contents: historyContents,
+                        config: {
+                            systemInstruction: FAUSTO_AGENT_PROMPT,
+                            temperature: 0.2
+                        }
+                    });
                 }
             }
 
-            return response.text || "I was unable to formulate a response.";
+            if (response?.text) return response.text;
+            if (response?.candidates?.[0]?.content?.parts?.[0]?.text) {
+                return response.candidates[0].content.parts[0].text;
+            }
+            return "I was unable to formulate a response.";
         } catch (error: any) {
             console.error("Gemini API Error:", error);
             if (error?.message?.includes('API key not valid') || error?.status === 401 || error?.status === 403) {
