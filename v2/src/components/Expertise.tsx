@@ -1,4 +1,15 @@
-const Expertise = () => {
+import type { Theme } from '../data/uiText';
+
+type ExpertiseProps = {
+    theme: Theme;
+    text: {
+        titleTop: string;
+        titleBottom: string;
+        description: string;
+    };
+};
+
+const Expertise = ({ theme, text }: ExpertiseProps) => {
     // We duplicate the lists to create a seamless infinite scroll effect
     const techStackTop = [
         "Python", "FastAPI", "TypeScript", "React", "Node.js", "Docker", "PostgreSQL", "Nginx", "Linux",
@@ -11,16 +22,16 @@ const Expertise = () => {
     ];
 
     return (
-        <section id="expertise" className="py-24 sm:py-32 overflow-hidden bg-slate-950 relative border-t border-b border-white/5">
+        <section id="expertise" className={`py-24 sm:py-32 overflow-hidden relative border-t border-b ${theme === 'dark' ? 'bg-slate-950 border-white/5' : 'bg-white border-slate-200'}`}>
             {/* Background glow */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-64 bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none"></div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center mb-16 sm:mb-24">
-                <h2 className="text-4xl sm:text-5xl md:text-7xl font-black mb-6 tracking-tighter text-white">
-                    Built for <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500">Scale.</span>
+                <h2 className={`text-4xl sm:text-5xl md:text-7xl font-black mb-6 tracking-tighter ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+                    {text.titleTop} <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500">{text.titleBottom}</span>
                 </h2>
-                <p className="text-lg sm:text-xl md:text-2xl text-slate-400 font-light max-w-3xl mx-auto leading-relaxed">
-                    I don't just write scripts. I architect <strong className="text-slate-200">end-to-end production systems</strong>—from async Python APIs to multi-agent TypeScript orchestration, bound by secure JWT auth and vectorized databases.
+                <p className={`text-lg sm:text-xl md:text-2xl font-light max-w-3xl mx-auto leading-relaxed ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+                    {text.description}
                 </p>
             </div>
 

@@ -4,19 +4,23 @@ import { Terminal as TerminalIcon, Send, Bot, Key, Settings2, Globe, HelpCircle,
 import { GoogleGenAI } from '@google/genai';
 import { FAUSTO_AGENT_PROMPT } from '../data/agentPrompt';
 import { getDocsContextForQuery } from '../lib/docsRag';
+import { uiText, type Lang } from '../data/uiText';
 
-const INITIAL_MESSAGES = [
-    { role: 'system', content: 'Connection established to FaustoOS v2.0... (Powered by Gemini 3.1 Pro)' },
-    { role: 'model', content: "Hello! I'm a specialized AI agent designed to answer questions about Fausto Saccoccio's engineering capabilities. To get started, please click the Settings icon (⚙️) above to paste your Gemini API key!" }
+const getInitialMessages = (lang: Lang) => [
+    { role: 'system', content: uiText[lang].chat.initialSystem },
+    { role: 'model', content: uiText[lang].chat.initialModel }
 ];
 
-const AgentChat = () => {
+type AgentChatProps = { lang: Lang };
+
+const AgentChat = ({ lang }: AgentChatProps) => {
+    const labels = uiText[lang].chat;
     const [messages, setMessages] = useState<{ role: string, content: string }[]>(() => {
         const saved = localStorage.getItem('chatHistory');
         if (saved) {
-            try { return JSON.parse(saved); } catch (e) { return INITIAL_MESSAGES; }
+            try { return JSON.parse(saved); } catch (e) { return getInitialMessages(lang); }
         }
-        return INITIAL_MESSAGES;
+        return getInitialMessages(lang);
     });
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
@@ -36,7 +40,7 @@ const AgentChat = () => {
     };
 
     const handleClearChat = () => {
-        setMessages(INITIAL_MESSAGES);
+        setMessages(getInitialMessages(lang));
         localStorage.removeItem('chatHistory');
         localStorage.setItem('chatMsgCount', '0');
         setMessageCount(0);
@@ -56,6 +60,14 @@ const AgentChat = () => {
         localStorage.setItem('chatHistory', JSON.stringify(messages));
     }, [messages, isTyping]);
 
+    useEffect(() => {
+        const initial = getInitialMessages(lang);
+        setMessages(initial);
+        localStorage.setItem('chatHistory', JSON.stringify(initial));
+        localStorage.setItem('chatMsgCount', '0');
+        setMessageCount(0);
+    }, [lang]);
+
     const getAgentResponse = async (userInput: string, chatHistory: any[]) => {
         const activeKey = customKey.trim() || import.meta.env.VITE_GEMINI_API_KEY;
 
@@ -65,6 +77,50 @@ const AgentChat = () => {
 
         try {
             const dynamicAi = new GoogleGenAI({ apiKey: activeKey });
+            const extractErrorMessage = (error: any): string => {
+                if (typeof error?.message === 'string' && error.message.length > 0) return error.message;
+                if (typeof error?.error?.message === 'string' && error.error.message.length > 0) return error.error.message;
+                try {
+                    return JSON.stringify(error);
+                } catch {
+                    return String(error);
+                }
+            };
+
+            const shouldFallbackNoTools = (error: any): boolean => {
+                const message = extractErrorMessage(error);
+                return (
+                    message.includes('Tool use with function calling is unsupported by the model') ||
+                    message.includes('function_calling_config') ||
+                    message.includes('not found for API version') ||
+                    message.includes('is not found')
+                );
+            };
+
+            const runGenerate = async (model: string, tools?: any) => {
+                try {
+                    return await dynamicAi.models.generateContent({
+                        model,
+                        contents: historyContents,
+                        config: {
+                            systemInstruction: FAUSTO_AGENT_PROMPT,
+                            temperature: 0.2,
+                            tools
+                        }
+                    });
+                } catch (error: any) {
+                    if (!tools || !shouldFallbackNoTools(error)) throw error;
+                    return await dynamicAi.models.generateContent({
+                        model: 'gemini-2.5-flash-lite',
+                        contents: historyContents,
+                        config: {
+                            systemInstruction: FAUSTO_AGENT_PROMPT,
+                            temperature: 0.2
+                        }
+                    });
+                }
+            };
+
             // Convert local state messages to Gemini prompt format and append new input
             const historyContents: any[] = chatHistory
                 .filter(m => m.role !== 'system')
@@ -99,48 +155,11 @@ const AgentChat = () => {
 
                 historyContents.push({ role: 'user', parts: [{ text: ragPrompt }] });
 
-                response = await dynamicAi.models.generateContent({
-                    model: 'gemini-2.5-flash-lite',
-                    contents: historyContents,
-                    config: {
-                        systemInstruction: FAUSTO_AGENT_PROMPT,
-                        temperature: 0.2
-                    }
-                });
+                response = await runGenerate('gemini-2.5-flash-lite');
             } else {
                 const tools = route === 'web_search' ? [{ googleSearch: {} }] : undefined;
                 const model = route === 'web_search' ? 'gemini-2.5-flash' : 'gemini-2.5-flash-lite';
-
-                try {
-                    response = await dynamicAi.models.generateContent({
-                        model,
-                        contents: historyContents,
-                        config: {
-                            systemInstruction: FAUSTO_AGENT_PROMPT,
-                            temperature: 0.2,
-                            tools
-                        }
-                    });
-                } catch (primaryError: any) {
-                    const message = primaryError?.message || '';
-                    const unsupportedTooling =
-                        message.includes('Tool use with function calling is unsupported by the model') ||
-                        message.includes('function_calling_config');
-                    const unknownModel =
-                        message.includes('not found for API version') ||
-                        message.includes('is not found');
-
-                    if (!unsupportedTooling && !unknownModel) throw primaryError;
-
-                    response = await dynamicAi.models.generateContent({
-                        model: 'gemini-2.5-flash-lite',
-                        contents: historyContents,
-                        config: {
-                            systemInstruction: FAUSTO_AGENT_PROMPT,
-                            temperature: 0.2
-                        }
-                    });
-                }
+                response = await runGenerate(model, tools);
             }
 
             if (response?.text) return response.text;
@@ -156,12 +175,12 @@ const AgentChat = () => {
 
             let errorMessage = "Unknown error connecting to the LLM endpoint.";
             try {
-                const parsed = JSON.parse(error.message);
+                const parsed = JSON.parse(error?.message || '');
                 if (parsed.error && parsed.error.message) {
                     errorMessage = parsed.error.message;
                 }
             } catch (e) {
-                errorMessage = error.message || error.toString();
+                errorMessage = error?.message || error?.error?.message || error.toString();
             }
             return `Gemini API Error: ${errorMessage}`;
         }
@@ -225,7 +244,7 @@ const AgentChat = () => {
                             className="p-1 sm:p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-400/10 rounded-md transition-colors text-[10px] sm:text-xs font-medium"
                             title="Clear Chat History"
                         >
-                            Clear
+                            {labels.clear}
                         </button>
                         <button
                             type="button"
@@ -234,7 +253,7 @@ const AgentChat = () => {
                             title="Toggle Web Browsing"
                         >
                             <Globe size={12} className={`sm:w-3.5 sm:h-3.5 ${useWebSearch ? 'animate-pulse' : ''}`} />
-                            <span>{useWebSearch ? 'Search ON' : 'Search OFF'}</span>
+                            <span>{useWebSearch ? labels.searchOn : labels.searchOff}</span>
                         </button>
                         <button
                             type="button"
@@ -265,7 +284,7 @@ const AgentChat = () => {
                                     type="password"
                                     value={customKey}
                                     onChange={(e) => setCustomKey(e.target.value)}
-                                    placeholder="Paste Gemini API Key (Optional)..."
+                                    placeholder={labels.keyPlaceholder}
                                     className="w-full bg-slate-950 border border-slate-700 rounded-lg py-1.5 pl-9 pr-3 text-slate-300 font-mono text-xs focus:outline-none focus:border-blue-500/50 placeholder:text-slate-600"
                                 />
                             </div>
@@ -273,7 +292,7 @@ const AgentChat = () => {
                                 type="submit"
                                 className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-medium transition-colors whitespace-nowrap"
                             >
-                                Save Key
+                                {labels.saveKey}
                             </button>
                         </form>
                         <div className="flex items-center justify-end gap-1.5 mt-1">
@@ -289,7 +308,7 @@ const AgentChat = () => {
                                 rel="noopener noreferrer"
                                 className="text-[10px] text-slate-500 hover:text-emerald-400 transition-colors"
                             >
-                                Get a free API Key on AI Studio →
+                                {labels.getFreeKey}
                             </a>
                         </div>
                     </div>
@@ -351,7 +370,7 @@ const AgentChat = () => {
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder="Ask about my tech stack..."
+                        placeholder={labels.inputPlaceholder}
                         className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-8 pr-12 text-slate-200 font-mono text-sm focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-slate-600"
                         disabled={isTyping}
                     />
