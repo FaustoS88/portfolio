@@ -25,7 +25,27 @@ body {
   background: linear-gradient(135deg, #34d399, #10b981, #059669);
   -webkit-background-clip: text;
   background-clip: text;
-  color: transparent;
+  color: #10b981;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Stable gradient text for large hero heading across browsers */
+.hero-gradient-text {
+  display: inline-block;
+  background: linear-gradient(90deg, #2dd4bf, #34d399, #10b981);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: #10b981;
+  -webkit-text-fill-color: transparent;
+}
+
+@supports not (-webkit-background-clip: text) {
+  .text-gradient,
+  .hero-gradient-text {
+    background: none;
+    color: #10b981;
+    -webkit-text-fill-color: initial;
+  }
 }
 
 /* =========================================
