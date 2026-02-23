@@ -72,6 +72,10 @@ body {
   transform: rotateY(180deg);
 }
 
+.project-card.is-flipped .preserve-3d {
+  transform: rotateY(180deg);
+}
+
 /* The front and back faces */
 .backface-hidden {
   backface-visibility: hidden;
@@ -88,17 +92,6 @@ body {
   -webkit-transform: rotateY(180deg) translateZ(1px);
 }
 
-/* Touch devices often render CSS 3D flips inconsistently (mirrored text),
-   so fall back to front-only cards there. */
-@media (hover: none), (pointer: coarse) {
-  .group:hover .preserve-3d {
-    transform: none;
-  }
-
-  .card-face-back {
-    display: none;
-  }
-}
 
 /* =========================================
    Background Animations

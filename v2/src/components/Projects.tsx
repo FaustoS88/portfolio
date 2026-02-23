@@ -1,3 +1,4 @@
+import { useState, type MouseEvent } from 'react';
 import { Github, Star, ExternalLink } from 'lucide-react';
 import type { Lang, Theme } from '../data/uiText';
 
@@ -15,6 +16,7 @@ type ProjectsProps = {
 };
 
 const Projects = ({ lang, theme, text }: ProjectsProps) => {
+    const [flippedCard, setFlippedCard] = useState<number | null>(null);
     const projectsByLang = {
         en: [
         {
@@ -146,6 +148,12 @@ const Projects = ({ lang, theme, text }: ProjectsProps) => {
 
     const projects = projectsByLang[lang];
 
+    const handleCardToggle = (index: number, event: MouseEvent<HTMLDivElement>) => {
+        const target = event.target as HTMLElement;
+        if (target.closest('a, button')) return;
+        setFlippedCard(prev => (prev === index ? null : index));
+    };
+
     return (
         <section id="projects" className="py-24 relative z-10">
             <div className="text-center mb-20 relative">
@@ -157,9 +165,13 @@ const Projects = ({ lang, theme, text }: ProjectsProps) => {
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-14 px-4 sm:px-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-14 px-4 sm:px-0">
                 {projects.map((project, index) => (
-                    <div key={index} className="group perspective-1000 h-[450px] w-full cursor-pointer">
+                    <div
+                        key={index}
+                        className={`group project-card perspective-1000 h-[450px] w-full cursor-pointer ${flippedCard === index ? 'is-flipped' : ''}`}
+                        onClick={(event) => handleCardToggle(index, event)}
+                    >
                         <div className="relative w-full h-full preserve-3d">
 
                             {/* === FRONT FACE === */}
