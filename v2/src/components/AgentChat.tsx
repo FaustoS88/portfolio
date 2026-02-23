@@ -69,25 +69,27 @@ const AgentChat = () => {
 
             if (useWebSearch) {
                 // Native search + Our custom client-side "Mock-MCP" scraper
-                // Both capabilities MUST be nested inside a SINGLE Tool object to avoid API collisions in Gemini.
-                tools = [{
-                    googleSearch: {},
-                    functionDeclarations: [{
-                        name: "read_documentation",
-                        description: "Fetches and reads the text content of a specific URL. Use this to read documentation libraries like Pydantic AI, FastAPI, Devin, or StackOverflow. Do NOT use this for normal Google Searches.",
-                        parameters: {
-                            type: "OBJECT",
-                            properties: {
-                                url: {
-                                    type: "STRING",
-                                    description: "The absolute URL to read (e.g., https://ai.pydantic.dev/)"
-                                }
-                            },
-                            required: ["url"]
-                        }
-                    }]
-                }];
-                // Upgrade to the 3.1 Pro Preview Custom Tools model. The 2.5 models reject payloads mixing native Google Search + Custom Functions.
+                // These must be distinct objects within the tools array per Gemini API Specs
+                tools = [
+                    { googleSearch: {} },
+                    {
+                        functionDeclarations: [{
+                            name: "read_documentation",
+                            description: "Fetches and reads the text content of a specific URL. Use this to read documentation libraries like Pydantic AI, FastAPI, Devin, or StackOverflow. Do NOT use this for normal Google Searches.",
+                            parameters: {
+                                type: "OBJECT",
+                                properties: {
+                                    url: {
+                                        type: "STRING",
+                                        description: "The absolute URL to read (e.g., https://ai.pydantic.dev/)"
+                                    }
+                                },
+                                required: ["url"]
+                            }
+                        }]
+                    }
+                ];
+                // Upgrade to the 3.1 Pro Preview Custom Tools model.
                 chosenModel = 'gemini-3.1-pro-preview-customtools';
             }
 
