@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Terminal as TerminalIcon, Send, Bot, Key, Settings2, Globe } from 'lucide-react';
+import { Terminal as TerminalIcon, Send, Bot, Key, Settings2, Globe, HelpCircle } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { FAUSTO_AGENT_PROMPT } from '../data/agentPrompt';
 
@@ -214,14 +214,22 @@ const AgentChat = () => {
                                 Save Key
                             </button>
                         </form>
-                        <a
-                            href="https://aistudio.google.com/app/api-keys"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[10px] text-slate-500 hover:text-emerald-400 transition-colors text-right"
-                        >
-                            Get a free API Key on AI Studio →
-                        </a>
+                        <div className="flex items-center justify-end gap-1.5 mt-1">
+                            <div className="relative group flex items-center">
+                                <HelpCircle size={12} className="text-slate-500 hover:text-slate-300 cursor-help" />
+                                <div className="absolute bottom-full right-0 mb-2 w-48 p-2 bg-slate-800 border border-slate-700 rounded shadow-xl text-[10px] text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                                    Generate a free key, paste it here, and click Save. Your key is stored securely in your browser and is never sent to our servers.
+                                </div>
+                            </div>
+                            <a
+                                href="https://aistudio.google.com/app/api-keys"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[10px] text-slate-500 hover:text-emerald-400 transition-colors"
+                            >
+                                Get a free API Key on AI Studio →
+                            </a>
+                        </div>
                     </div>
                 )}
             </div>
