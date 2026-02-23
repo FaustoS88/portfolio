@@ -154,24 +154,34 @@ const AgentChat = () => {
 
                 {/* BYOK Input Area */}
                 {showKeyInput && (
-                    <form onSubmit={handleSaveKey} className="px-4 py-3 bg-slate-900/50 border-t border-slate-800/50 flex gap-2">
-                        <div className="relative flex-1 text-slate-500">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2"><Key size={14} /></span>
-                            <input
-                                type="password"
-                                value={customKey}
-                                onChange={(e) => setCustomKey(e.target.value)}
-                                placeholder="Paste Gemini API Key (Optional)..."
-                                className="w-full bg-slate-950 border border-slate-700 rounded-lg py-1.5 pl-9 pr-3 text-slate-300 font-mono text-xs focus:outline-none focus:border-blue-500/50 placeholder:text-slate-600"
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-medium transition-colors"
+                    <div className="px-4 py-3 bg-slate-900/50 border-t border-slate-800/50 flex flex-col gap-2">
+                        <form onSubmit={handleSaveKey} className="flex gap-2">
+                            <div className="relative flex-1 text-slate-500">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2"><Key size={14} /></span>
+                                <input
+                                    type="password"
+                                    value={customKey}
+                                    onChange={(e) => setCustomKey(e.target.value)}
+                                    placeholder="Paste Gemini API Key (Optional)..."
+                                    className="w-full bg-slate-950 border border-slate-700 rounded-lg py-1.5 pl-9 pr-3 text-slate-300 font-mono text-xs focus:outline-none focus:border-blue-500/50 placeholder:text-slate-600"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-medium transition-colors"
+                            >
+                                Save
+                            </button>
+                        </form>
+                        <a
+                            href="https://aistudio.google.com/app/api-keys"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] text-slate-500 hover:text-emerald-400 transition-colors text-right"
                         >
-                            Save
-                        </button>
-                    </form>
+                            Get a free API Key on AI Studio →
+                        </a>
+                    </div>
                 )}
             </div>
 
