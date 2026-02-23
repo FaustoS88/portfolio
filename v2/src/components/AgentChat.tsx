@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Terminal as TerminalIcon, Send, Bot, Key, Settings2, Globe, HelpCircle, Maximize2, Minimize2 } from 'lucide-react';
+import { Terminal as TerminalIcon, Send, Bot, Key, Settings2, Globe, HelpCircle, Maximize2, Minimize2, ChevronDown, ChevronUp } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { FAUSTO_AGENT_PROMPT } from '../data/agentPrompt';
 import { docsRagMeta, getDocsContextForQuery } from '../lib/docsRag';
@@ -29,6 +29,7 @@ const AgentChat = ({ lang }: AgentChatProps) => {
     const [customKey, setCustomKey] = useState(localStorage.getItem('customGeminiKey') || '');
     const [useWebSearch, setUseWebSearch] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
+    const [showSuggestions, setShowSuggestions] = useState(false);
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const isSendingRef = useRef(false);
 
@@ -332,19 +333,31 @@ const AgentChat = ({ lang }: AgentChatProps) => {
                     <div className="text-[10px] text-slate-400">
                         {labels.ragInfo} ({docsRagMeta.maxContextChunks} chunks max, ~{docsRagMeta.chunkSize} chars/chunk)
                     </div>
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                        <span className="text-[10px] text-slate-500">{labels.suggestionsTitle}</span>
-                        {labels.suggestions.map((suggestion, idx) => (
-                            <button
-                                key={idx}
-                                type="button"
-                                onClick={() => setInput(suggestion)}
-                                className="px-2 py-1 rounded border border-slate-700 text-[10px] text-slate-300 hover:bg-slate-800 transition-colors text-left"
-                            >
-                                {suggestion}
-                            </button>
-                        ))}
+                    <div className="mt-2">
+                        <button
+                            type="button"
+                            onClick={() => setShowSuggestions(prev => !prev)}
+                            className="inline-flex items-center gap-1.5 px-2 py-1 rounded border border-slate-700 text-[10px] text-slate-300 hover:bg-slate-800 transition-colors"
+                        >
+                            <span>{showSuggestions ? labels.suggestionsToggleClose : labels.suggestionsToggleOpen}</span>
+                            {showSuggestions ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                        </button>
                     </div>
+                    {showSuggestions && (
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                            <span className="text-[10px] text-slate-500">{labels.suggestionsTitle}</span>
+                            {labels.suggestions.map((suggestion, idx) => (
+                                <button
+                                    key={idx}
+                                    type="button"
+                                    onClick={() => setInput(suggestion)}
+                                    className="px-2 py-1 rounded border border-slate-700 text-[10px] text-slate-300 hover:bg-slate-800 transition-colors text-left"
+                                >
+                                    {suggestion}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
 

@@ -44,10 +44,11 @@ export const uiText = {
             inputPlaceholder: 'Ask about my tech stack...',
             ragInfo: 'Client-side Docs RAG: local crawl + chunk retrieval. Cache: 3 days.',
             suggestionsTitle: 'Try:',
+            suggestionsToggleOpen: 'Show examples',
+            suggestionsToggleClose: 'Hide examples',
             suggestions: [
                 'Search pydantic-ai docs and show how to build a weather agent from the official example.',
-                'Read FastAPI docs and summarize how dependency injection works with a minimal example.',
-                'Read LangGraph docs and explain state + edges in one practical pattern.'
+                'Read FastAPI docs and summarize how dependency injection works with a minimal example.'
             ]
         }
     },
@@ -93,10 +94,11 @@ export const uiText = {
             inputPlaceholder: 'Chiedi del mio stack tecnico...',
             ragInfo: 'Docs RAG client-side: crawl locale + recupero chunk. Cache: 3 giorni.',
             suggestionsTitle: 'Prova:',
+            suggestionsToggleOpen: 'Mostra esempi',
+            suggestionsToggleClose: 'Nascondi esempi',
             suggestions: [
                 'Cerca nei docs di pydantic-ai e mostra come costruire un weather agent dall esempio ufficiale.',
-                'Leggi i docs di FastAPI e riassumi come funziona la dependency injection con un esempio minimo.',
-                'Leggi i docs di LangGraph e spiega stato + edge in un pattern pratico.'
+                'Leggi i docs di FastAPI e riassumi come funziona la dependency injection con un esempio minimo.'
             ]
         }
     },
@@ -142,10 +144,11 @@ export const uiText = {
             inputPlaceholder: 'Pregunta por mi stack tecnico...',
             ragInfo: 'Docs RAG en cliente: rastreo local + recuperacion de chunks. Cache: 3 dias.',
             suggestionsTitle: 'Prueba:',
+            suggestionsToggleOpen: 'Mostrar ejemplos',
+            suggestionsToggleClose: 'Ocultar ejemplos',
             suggestions: [
                 'Busca en docs de pydantic-ai y muestra como crear un weather agent desde el ejemplo oficial.',
-                'Lee docs de FastAPI y resume como funciona dependency injection con un ejemplo minimo.',
-                'Lee docs de LangGraph y explica estado + aristas en un patron practico.'
+                'Lee docs de FastAPI y resume como funciona dependency injection con un ejemplo minimo.'
             ]
         }
     }
