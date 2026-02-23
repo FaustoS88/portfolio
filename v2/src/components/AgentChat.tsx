@@ -3,7 +3,7 @@ import { Terminal as TerminalIcon, Send, Bot } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 
 // Initialize the Gemini client using the Vite environment variable
-// We use gemini-2.5-flash as it has a very generous free tier suitable for a portfolio
+// We use gemini-1.5-flash-8b as it is the most cost-effective and fastest model for simple Q&A
 const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || 'demo_key' });
 
 const SYSTEM_INSTRUCTION = `
@@ -19,11 +19,12 @@ Do NOT hallucinate.If you don't know, say you are a lightweight portfolio agent 
 
 const AgentChat = () => {
     const [messages, setMessages] = useState([
-        { role: 'system', content: 'Connection established to FaustoOS v2.0... (Powered by Gemini Flash)' },
+        { role: 'system', content: 'Connection established to FaustoOS v2.0... (Powered by Gemini Flash 8B)' },
         { role: 'model', content: "Hello. I'm an autonomous agent designed to answer questions about Fausto Saccoccio's engineering capabilities. What would you like to know?" }
     ]);
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
+    const [messageCount, setMessageCount] = useState(parseInt(localStorage.getItem('chatMsgCount') || '0'));
     const chatContainerRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -42,13 +43,13 @@ const AgentChat = () => {
     const getAgentResponse = async (userInput: string) => {
         if (!import.meta.env.VITE_GEMINI_API_KEY) {
             // Fallback for demo without key
-            return "The VITE_GEMINI_API_KEY environment variable is missing. In a live environment, this would answer your query using Gemini 2.5 Flash.";
+            return "FaustoOS is currently in offline demo mode. In a live environment with an API key, I would dynamically answer your query using Gemini 1.5 Flash 8B. Please reach out to Fausto directly via email at faustosaccoccio1988@gmail.com!";
         }
 
         try {
             // Lightweight one-shot request with system instruction config
             const response = await ai.models.generateContent({
-                model: 'gemini-2.5-flash',
+                model: 'gemini-1.5-flash-8b',
                 contents: userInput,
                 config: {
                     systemInstruction: SYSTEM_INSTRUCTION,
@@ -69,6 +70,18 @@ const AgentChat = () => {
 
         const userMessage = input.trim();
         setInput('');
+
+        if (messageCount >= 10) {
+            setMessages(prev => [...prev, { role: 'user', content: userMessage }, { role: 'system', content: 'RATE LIMIT EXCEEDED' }, { role: 'model', content: "Rate limit exceeded. To prevent abuse, guest sessions are limited to 10 messages. Please contact Fausto directly at faustosaccoccio1988@gmail.com." }]);
+            return;
+        }
+
+        setMessageCount(prev => {
+            const newCount = prev + 1;
+            localStorage.setItem('chatMsgCount', newCount.toString());
+            return newCount;
+        });
+
         setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
         setIsTyping(true);
 
