@@ -2,10 +2,10 @@ import AgentChat from './AgentChat';
 
 const Hero = () => {
     return (
-        <section id="home" className="min-h-[95vh] flex flex-col md:flex-row items-center justify-between relative z-10 pt-24 pb-12 gap-12">
+        <section id="home" className="min-h-[95vh] flex flex-col lg:flex-row items-center justify-between relative z-10 pt-24 pb-12 gap-12">
 
             {/* Left side: Text Content */}
-            <div className="w-full md:w-[55%] flex flex-col text-left">
+            <div className="w-full lg:w-[55%] flex flex-col text-left">
 
                 {/* Dynamic Badge */}
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 border border-slate-800 mb-8 self-start hover-lift">
@@ -39,10 +39,10 @@ const Hero = () => {
             </div>
 
             {/* Right side: Interactive Terminal Chat */}
-            <div className="w-full md:w-[45%] relative perspective-1000 mt-8 md:mt-0">
+            <div className="w-full lg:w-[45%] relative perspective-1000 mt-8 md:mt-12 lg:mt-0 xl:mb-0 mb-4 flex justify-center">
                 {/* Background decorative glow for terminal */}
                 <div className="absolute -inset-4 bg-gradient-to-r from-emerald-600 to-teal-600 opacity-20 blur-2xl rounded-full z-0 animate-pulse-glow"></div>
-                <div className="relative z-10 transform md:rotate-y-[-5deg] md:rotate-x-[5deg] transition-transform duration-500 hover:rotate-y-0 hover:rotate-x-0">
+                <div className="relative z-10 w-full transform lg:rotate-y-[-5deg] lg:rotate-x-[5deg] transition-transform duration-500 hover:rotate-y-0 hover:rotate-x-0">
                     <AgentChat />
                 </div>
             </div>
