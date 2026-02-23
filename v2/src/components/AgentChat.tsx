@@ -4,8 +4,8 @@ import { GoogleGenAI } from '@google/genai';
 import { FAUSTO_AGENT_PROMPT } from '../data/agentPrompt';
 
 const INITIAL_MESSAGES = [
-    { role: 'system', content: 'Connection established to FaustoOS v2.0... (Powered by Gemini 2.5 Flash-Lite)' },
-    { role: 'model', content: "Hello. I'm a specialized AI agent designed to answer questions about Fausto Saccoccio's engineering capabilities. What would you like to know?" }
+    { role: 'system', content: 'Connection established to FaustoOS v2.0... (Powered by Gemini 2.5 Flash)' },
+    { role: 'model', content: "Hello! I'm a specialized AI agent designed to answer questions about Fausto Saccoccio's engineering capabilities. To get started, please click the Settings icon (⚙️) above to paste your Gemini API key!" }
 ];
 
 const AgentChat = () => {
