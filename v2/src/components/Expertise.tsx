@@ -1,85 +1,62 @@
 const Expertise = () => {
+    // We duplicate the lists to create a seamless infinite scroll effect
+    const techStackTop = [
+        "Python", "FastAPI", "TypeScript", "React", "Node.js", "Docker", "PostgreSQL", "Nginx", "Linux",
+        "Python", "FastAPI", "TypeScript", "React", "Node.js", "Docker", "PostgreSQL", "Nginx", "Linux"
+    ];
+
+    const techStackBottom = [
+        "Pydantic-AI", "LangGraph", "pgvector", "crawl4ai", "SmolAgents", "MCP Servers", "OpenAI", "Anthropic", "Gemini", "DeepSeek",
+        "Pydantic-AI", "LangGraph", "pgvector", "crawl4ai", "SmolAgents", "MCP Servers", "OpenAI", "Anthropic", "Gemini", "DeepSeek"
+    ];
+
     return (
-        <section id="expertise" className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-            <div className="text-center mb-12 sm:mb-16">
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">
-                    My <span className="gradient-text">Expertise</span>
+        <section id="expertise" className="py-24 sm:py-32 overflow-hidden bg-slate-950 relative border-t border-b border-white/5">
+            {/* Background glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-64 bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none"></div>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center mb-16 sm:mb-24">
+                <h2 className="text-4xl sm:text-5xl md:text-7xl font-black mb-6 tracking-tighter text-white">
+                    Built for <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500">Scale.</span>
                 </h2>
-                <p className="text-base sm:text-lg text-slate-400 max-w-3xl mx-auto">
-                    Specializing in cutting-edge AI Agents development with a full stack approach
+                <p className="text-lg sm:text-xl md:text-2xl text-slate-400 font-light max-w-3xl mx-auto leading-relaxed">
+                    I don't just write scripts. I architect <strong className="text-slate-200">end-to-end production systems</strong>—from async Python APIs to multi-agent TypeScript orchestration, bound by secure JWT auth and vectorized databases.
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                <div className="glow-card bg-slate-800/50 rounded-xl p-6 sm:p-8 border border-slate-700">
-                    <div className="text-blue-400 text-3xl sm:text-4xl mb-4 sm:mb-6">
-                        <i className="fas fa-robot"></i>
-                    </div>
-                    <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">AI Agent Engineering</h3>
-                    <p className="text-slate-400 mb-5 sm:mb-6 text-sm sm:text-base">
-                        Building sophisticated AI agents with frameworks like Pydantic-AI, LangGraph, and MCP architectures for complex problem-solving.
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                        <span className="px-2 sm:px-3 py-1 bg-blue-900/30 text-blue-400 rounded-full text-xs sm:text-sm">Pydantic-AI</span>
-                        <span className="px-2 sm:px-3 py-1 bg-emerald-900/30 text-emerald-400 rounded-full text-xs sm:text-sm">LangGraph</span>
-                        <span className="px-2 sm:px-3 py-1 bg-green-900/30 text-green-400 rounded-full text-xs sm:text-sm">RAG</span>
-                        <span className="px-2 sm:px-3 py-1 bg-teal-900/30 text-teal-400 rounded-full text-xs sm:text-sm">MCP-Servers</span>
+            {/* Marquee Section */}
+            <div className="w-full flex flex-col gap-6 sm:gap-8 relative select-none">
+
+                {/* Gradient Fades for the edges */}
+                <div className="absolute inset-y-0 left-0 w-16 sm:w-32 bg-gradient-to-r from-slate-950 to-transparent z-20 pointer-events-none"></div>
+                <div className="absolute inset-y-0 right-0 w-16 sm:w-32 bg-gradient-to-l from-slate-950 to-transparent z-20 pointer-events-none"></div>
+
+                {/* Top Row - Core Engineering */}
+                <div className="flex overflow-hidden w-full group">
+                    <div className="animate-marquee items-center gap-4 sm:gap-6 min-w-full">
+                        {techStackTop.map((tech, idx) => (
+                            <div key={idx} className="px-6 py-3 sm:px-8 sm:py-4 bg-slate-900 border border-slate-800 rounded-full flex-shrink-0 flex items-center gap-2 group-hover/btn:border-emerald-500/50 transition-colors">
+                                <span className="text-slate-300 font-mono text-sm sm:text-base md:text-lg font-medium tracking-wide">
+                                    {tech}
+                                </span>
+                            </div>
+                        ))}
                     </div>
                 </div>
 
-                <div className="glow-card bg-slate-800/50 rounded-xl p-6 sm:p-8 border border-slate-700">
-                    <div className="text-emerald-400 text-3xl sm:text-4xl mb-4 sm:mb-6">
-                        <i className="fas fa-layer-group"></i>
-                    </div>
-                    <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Full Stack Development</h3>
-                    <p className="text-slate-400 mb-5 sm:mb-6 text-sm sm:text-base">
-                        End-to-end application development with modern technologies, ensuring seamless integration between frontend and backend systems.
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                        <span className="px-2 sm:px-3 py-1 bg-red-900/30 text-red-400 rounded-full text-xs sm:text-sm">FastAPI</span>
-                        <span className="px-2 sm:px-3 py-1 bg-blue-900/30 text-blue-400 rounded-full text-xs sm:text-sm">TypeScript-React</span>
-                        <span className="px-2 sm:px-3 py-1 bg-green-900/30 text-green-400 rounded-full text-xs sm:text-sm">Node.js</span>
-                        <span className="px-2 sm:px-3 py-1 bg-yellow-900/30 text-yellow-400 rounded-full text-xs sm:text-sm">Python</span>
-                        <span className="px-2 sm:px-3 py-1 bg-emerald-900/30 text-emerald-400 rounded-full text-xs sm:text-sm">Vector-DB</span>
+                {/* Bottom Row - AI Intelligence */}
+                <div className="flex overflow-hidden w-full group">
+                    <div className="animate-marquee-slow items-center gap-4 sm:gap-6 min-w-full" style={{ animationDirection: 'reverse' }}>
+                        {techStackBottom.map((tech, idx) => (
+                            <div key={idx} className="px-6 py-3 sm:px-8 sm:py-4 bg-emerald-950/20 border border-emerald-900/30 rounded-full flex-shrink-0 flex items-center gap-2 group-hover/btn:border-emerald-500/50 transition-colors">
+                                <span className="text-emerald-400 font-mono text-sm sm:text-base md:text-lg font-medium tracking-wide">
+                                    {tech}
+                                </span>
+                            </div>
+                        ))}
                     </div>
                 </div>
 
-                <div className="glow-card bg-slate-800/50 rounded-xl p-6 sm:p-8 border border-slate-700">
-                    <div className="text-teal-400 text-3xl sm:text-4xl mb-4 sm:mb-6">
-                        <i className="fas fa-cogs"></i>
-                    </div>
-                    <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Custom AI Solutions</h3>
-                    <p className="text-slate-400 mb-5 sm:mb-6 text-sm sm:text-base">
-                        Tailored AI implementations designed specifically for your business needs, from concept to deployment.
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                        <span className="px-2 sm:px-3 py-1 bg-blue-900/30 text-blue-400 rounded-full text-xs sm:text-sm">Hybrid LLM Integration</span>
-                        <span className="px-2 sm:px-3 py-1 bg-teal-900/30 text-teal-400 rounded-full text-xs sm:text-sm">Custom Workflows</span>
-                        <span className="px-2 sm:px-3 py-1 bg-emerald-900/30 text-emerald-400 rounded-full text-xs sm:text-sm">Fine-tuning</span>
-                        <span className="px-2 sm:px-3 py-1 bg-green-900/30 text-green-400 rounded-full text-xs sm:text-sm">Agent Orchestration</span>
-                    </div>
-                </div>
-            </div>
-
-            <div className="mt-16 sm:mt-20">
-                <h3 className="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-center">My <span className="gradient-text">Tech Stack</span></h3>
-                <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-8">
-                    <div className="tech-icon text-4xl sm:text-5xl text-blue-400" title="Python"><i className="fab fa-python"></i></div>
-                    <div className="tech-icon text-4xl sm:text-5xl text-yellow-400" title="JavaScript"><i className="fab fa-js"></i></div>
-                    <div className="tech-icon text-4xl sm:text-5xl" title="TypeScript">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Typescript_logo_2020.svg" alt="TypeScript" className="h-8 sm:h-10" />
-                    </div>
-                    <div className="tech-icon text-4xl sm:text-5xl text-blue-500" title="React"><i className="fab fa-react"></i></div>
-                    <div className="tech-icon text-4xl sm:text-5xl border border-white/20 rounded p-1" title="Pydantic-AI">
-                        <img src="/portfolio/images/Ai_logo.png" alt="Pydantic-AI" className="h-8 sm:h-10" />
-                    </div>
-                    <div className="tech-icon text-4xl sm:text-5xl" title="DeepSeek">
-                        <img src="/portfolio/images/deepseek-color.ico" alt="DeepSeek" className="h-8 sm:h-10" />
-                    </div>
-                    <div className="tech-icon text-4xl sm:text-5xl" title="GitHub">
-                        <img src="/portfolio/images/github.ico" alt="GitHub" className="h-8 sm:h-10" />
-                    </div>
-                </div>
             </div>
         </section>
     );
