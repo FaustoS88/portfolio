@@ -64,9 +64,11 @@ const AgentChat = () => {
             const dynamicAi = new GoogleGenAI({ apiKey: activeKey });
 
             let tools: any = undefined;
+            // Native search often requires the standard flash model instead of flash-lite to return correctly structured grounded responses
+            let chosenModel = 'gemini-2.5-flash-lite';
             if (useWebSearch) {
-                // Native Gemini Google Search Grounding
                 tools = [{ googleSearch: {} }];
+                chosenModel = 'gemini-2.5-flash';
             }
 
             // Convert local state messages to Gemini prompt format and append new input
@@ -77,7 +79,7 @@ const AgentChat = () => {
             historyContents.push({ role: 'user', parts: [{ text: userInput }] });
 
             const response = await dynamicAi.models.generateContent({
-                model: 'gemini-2.5-flash-lite',
+                model: chosenModel,
                 contents: historyContents,
                 config: {
                     systemInstruction: FAUSTO_AGENT_PROMPT,
@@ -85,6 +87,14 @@ const AgentChat = () => {
                     tools: tools
                 }
             });
+
+            if (useWebSearch) {
+                // Grounding responses sometimes bury the text inside the parts array depending on SDK parsing
+                if (response.text) return response.text;
+                if (response.candidates?.[0]?.content?.parts?.[0]?.text) {
+                    return response.candidates[0].content.parts[0].text;
+                }
+            }
 
             return response.text || "I was unable to formulate a response.";
         } catch (error: any) {
@@ -143,22 +153,22 @@ const AgentChat = () => {
 
             {/* Header */}
             <div className="flex flex-col border-b border-slate-800">
-                <div className="flex items-center justify-between px-4 py-3 bg-slate-900">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 py-3 bg-slate-900 gap-2 sm:gap-0">
                     <div className="flex items-center">
-                        <div className="flex gap-2 mr-4">
+                        <div className="flex gap-2 mr-3 sm:mr-4">
                             <div className="w-3 h-3 rounded-full bg-rose-500"></div>
                             <div className="w-3 h-3 rounded-full bg-amber-500"></div>
                             <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
                         </div>
-                        <div className="text-xs text-slate-400 font-mono flex items-center gap-2">
-                            <TerminalIcon size={14} className="text-blue-400" /> pydantic_agent_v3.py (Live)
+                        <div className="text-[10px] sm:text-xs text-slate-400 font-mono flex items-center gap-1 sm:gap-2">
+                            <TerminalIcon size={12} className="text-blue-400 sm:w-3.5 sm:h-3.5" /> pydantic_agent_v3.py <span className="hidden sm:inline">(Live)</span>
                         </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center justify-end gap-1.5 sm:gap-2">
                         <button
                             type="button"
                             onClick={handleClearChat}
-                            className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-400/10 rounded-md transition-colors text-xs font-medium"
+                            className="p-1 sm:p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-400/10 rounded-md transition-colors text-[10px] sm:text-xs font-medium"
                             title="Clear Chat History"
                         >
                             Clear
@@ -166,19 +176,19 @@ const AgentChat = () => {
                         <button
                             type="button"
                             onClick={() => setUseWebSearch(!useWebSearch)}
-                            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-colors text-xs font-medium border ${useWebSearch ? 'text-emerald-400 bg-emerald-400/10 border-emerald-500/30' : 'text-slate-500 bg-slate-800/50 border-slate-700/50 hover:text-slate-300'}`}
+                            className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-md transition-colors text-[10px] sm:text-xs font-medium border ${useWebSearch ? 'text-emerald-400 bg-emerald-400/10 border-emerald-500/30' : 'text-slate-500 bg-slate-800/50 border-slate-700/50 hover:text-slate-300'}`}
                             title="Toggle Web Browsing"
                         >
-                            <Globe size={14} className={useWebSearch ? 'animate-pulse' : ''} />
-                            <span className="hidden sm:inline">{useWebSearch ? 'Web Search ON' : 'Web Search OFF'}</span>
+                            <Globe size={12} className={`sm:w-3.5 sm:h-3.5 ${useWebSearch ? 'animate-pulse' : ''}`} />
+                            <span>{useWebSearch ? 'Search ON' : 'Search OFF'}</span>
                         </button>
                         <button
                             type="button"
                             onClick={() => setShowKeyInput(!showKeyInput)}
-                            className={`p-1.5 rounded-md transition-colors ${customKey.trim() ? 'text-emerald-400 bg-emerald-400/10' : 'text-slate-400 hover:text-blue-400 hover:bg-blue-400/10'}`}
+                            className={`p-1 sm:p-1.5 rounded-md transition-colors ${customKey.trim() ? 'text-emerald-400 bg-emerald-400/10' : 'text-slate-400 hover:text-blue-400 hover:bg-blue-400/10'}`}
                             title="Bring Your Own Keys"
                         >
-                            <Settings2 size={16} />
+                            <Settings2 size={14} className="sm:w-4 sm:h-4" />
                         </button>
                     </div>
                 </div>
