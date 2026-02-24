@@ -1,41 +1,70 @@
-# Fausto Saccoccio - Portfolio (2026 Update)
+# Portfolio V2 (React + TypeScript)
 
-Welcome to the repository for my personal portfolio. 
+This is the active version of the portfolio site, including the live AI chat component.
 
-## V2 - React / Vite Migration
-The current active iteration of the portfolio is located in the `v2/` directory. It was rebuilt in 2026 using:
-- **React 19**
-- **TypeScript**
-- **Vite**
-- **Tailwind CSS v4** (Glassmorphism & deep dark aesthetics)
-- **Gemini-powered chat agent** with client-side docs mini-RAG
+## What is implemented
+- React 19 + Vite + TypeScript frontend
+- BYOK Gemini integration (`@google/genai`)
+- `Search ON` mode with native `googleSearch`
+- Client-side Docs Mini-RAG for docs-focused questions (no backend)
 
-### Local Development
-To run the portfolio locally:
-1. Navigate to the `v2` directory: `cd v2`
-2. Install dependencies: `npm install`
-3. Run the development server: `npm run dev`
-4. (Optional) Add `VITE_GEMINI_API_KEY` in a local `.env`
+## Docs Mini-RAG (Client-Side)
+When a prompt looks docs-related (for example: pydantic-ai, FastAPI, LangChain, LangGraph, or an explicit docs URL), the agent can:
+1. Crawl a small set of docs pages in the browser
+2. Chunk the text locally
+3. Cache the index in browser storage
+4. Retrieve top relevant chunks per query
+5. Answer using only those retrieved chunks
 
-### Basic Validation (Public Repo Friendly)
-From `v2/`:
-1. Build check: `npm run build`
-2. Gemini tool compatibility check: `npm run test:gemini-tools`
+Implementation file:
+- `src/lib/docsRag.ts`
 
-Detailed implementation notes are in `v2/README.md`.
+### Browser RAG Capabilities
+- Fully client-side (no backend required)
+- Local cache in browser storage with automatic expiration after **3 days**
+- Chunked retrieval context: up to **8 chunks** per answer, ~**900 chars** each
+- Domain-aware crawling for docs sources (PydanticAI, FastAPI, LangChain, LangGraph)
+- If docs relevance is low, the agent automatically falls back to web search route when `Search ON` is enabled
 
-### Browser Docs-RAG (V2)
-- Client-side docs retrieval and indexing (no backend required)
-- Cached in browser for 3 days
-- Uses chunk retrieval with confidence-based fallback to web search when needed
+## Local Setup
+```bash
+cd v2
+npm install
+npm run dev
+```
 
-### Deployment
-The project is configured for free hosting on GitHub Pages. To deploy updates:
-1. Make your changes inside `v2/src/`.
-2. Commit your changes.
-3. Run `npm run deploy` from the `v2` directory.
+Optional env for local development:
+```bash
+VITE_GEMINI_API_KEY=your_key_here
+```
 
-The deploy script automatically builds the React app into the `dist` folder and pushes it to the `gh-pages` branch. The live site reflects at `https://FaustoS88.github.io/portfolio/`.
+## Validation / Testing
+### 1) Build check
+```bash
+npm run build
+```
 
-## Legacy (V1)
-The root directory contains the original `index.html` and `style.css` files from the first iteration of the portfolio (Tailwind via CDN). They are preserved here for reference but the active project is now `v2`.
+### 2) Gemini tools compatibility check
+```bash
+npm run test:gemini-tools
+```
+This verifies the key API behavior:
+- mixed `googleSearch + functionDeclarations` fails
+- `googleSearch` only works
+- `functionDeclarations` only may work depending on model support
+
+### 3) Manual UI smoke test
+1. Start app with `npm run dev`
+2. Open the chat widget
+3. Toggle `Search ON`
+4. Ask a docs question: `Can you read pydantic-ai docs and show how to build a weather agent?`
+5. Confirm you see docs indexing/retrieval status lines and a grounded answer
+
+## Deploy (GitHub Pages)
+```bash
+npm run deploy
+```
+
+## Notes
+- This project is intentionally client-side to stay free-hosted on GitHub Pages.
+- No server-side secret storage is used in production; users can provide their own API key in the UI.
