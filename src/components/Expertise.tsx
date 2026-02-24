@@ -11,39 +11,38 @@ type ExpertiseProps = {
     };
 };
 
-const BASE = '/portfolio/assets/';
-const SI = 'https://cdn.simpleicons.org';
+const B = '/portfolio/assets/';
 
 const techStackTop: TechItem[] = [
-    { name: 'Python',     icon: `${SI}/python/3776AB` },
-    { name: 'FastAPI',    icon: `${SI}/fastapi/009688` },
-    { name: 'TypeScript', icon: `${SI}/typescript/3178C6` },
-    { name: 'React',      icon: `${SI}/react/61DAFB` },
-    { name: 'Node.js',    icon: `${SI}/nodedotjs/339933` },
-    { name: 'Docker',     icon: `${SI}/docker/2496ED` },
-    { name: 'PostgreSQL', icon: `${SI}/postgresql/336791` },
-    { name: 'GitHub',     icon: `${BASE}github.ico` },
-    { name: 'AWS',        icon: `${BASE}aws-color.ico` },
-    { name: 'Google Colab', icon: `${BASE}colab-color.ico` },
-    { name: 'Nginx',      icon: `${SI}/nginx/00AA4E` },
-    { name: 'Linux',      icon: `${SI}/linux/FCC624` },
+    { name: 'Python',      icon: `${B}python.svg` },
+    { name: 'FastAPI',     icon: `${B}fastapi.svg` },
+    { name: 'TypeScript',  icon: `${B}typescript.svg` },
+    { name: 'React',       icon: `${B}react.svg` },
+    { name: 'Node.js',     icon: `${B}nodejs.svg` },
+    { name: 'Docker',      icon: `${B}docker.svg` },
+    { name: 'PostgreSQL',  icon: `${B}postgresql.svg` },
+    { name: 'GitHub',      icon: `${B}github.ico` },
+    { name: 'AWS',         icon: `${B}aws-color.ico` },
+    { name: 'Google Colab', icon: `${B}colab-color.ico` },
+    { name: 'Nginx',       icon: `${B}nginx.svg` },
+    { name: 'Linux',       icon: `${B}linux.svg` },
 ];
 
 const techStackBottom: TechItem[] = [
-    { name: 'Pydantic-AI', icon: `${SI}/pydantic/E92063` },
-    { name: 'LangGraph',   icon: `${BASE}langgraph-color.ico` },
-    { name: 'LangChain',   icon: `${BASE}langchainLogo.ico` },
-    { name: 'pgvector' },
-    { name: 'crawl4ai' },
-    { name: 'SmolAgents' },
-    { name: 'MCP Servers', icon: `${BASE}mcp.ico` },
-    { name: 'Anthropic',   icon: `${BASE}anthropic.ico` },
-    { name: 'Claude',      icon: `${BASE}claude-color.ico` },
-    { name: 'Gemini',      icon: `${BASE}gemini-color.ico` },
-    { name: 'DeepSeek',    icon: `${BASE}deepseek-color.ico` },
-    { name: 'HuggingFace', icon: `${BASE}huggingface-color.ico` },
-    { name: 'Ollama',      icon: `${BASE}ollama.ico` },
-    { name: 'OpenAI',      icon: `${SI}/openai/FFFFFF` },
+    { name: 'Pydantic-AI', icon: `${B}pydantic.svg` },
+    { name: 'LangGraph',   icon: `${B}langgraph-color.ico` },
+    { name: 'LangChain',   icon: `${B}langchainLogo.ico` },
+    { name: 'pgvector',    icon: `${B}pgvector.svg` },
+    { name: 'crawl4ai',    icon: `${B}crawl4ai.svg` },
+    { name: 'SmolAgents',  icon: `${B}smolagents.svg` },
+    { name: 'MCP Servers', icon: `${B}mcp.ico` },
+    { name: 'Anthropic',   icon: `${B}anthropic.ico` },
+    { name: 'Claude',      icon: `${B}claude-color.ico` },
+    { name: 'Gemini',      icon: `${B}gemini-color.ico` },
+    { name: 'DeepSeek',    icon: `${B}deepseek-color.ico` },
+    { name: 'HuggingFace', icon: `${B}huggingface-color.ico` },
+    { name: 'Ollama',      icon: `${B}ollama.ico` },
+    { name: 'OpenAI',      icon: `${B}openai.svg` },
 ];
 
 // Duplicate for seamless infinite scroll
