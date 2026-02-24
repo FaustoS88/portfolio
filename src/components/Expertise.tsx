@@ -12,37 +12,38 @@ type ExpertiseProps = {
 };
 
 const BASE = '/portfolio/assets/';
+const SI = 'https://cdn.simpleicons.org';
 
 const techStackTop: TechItem[] = [
-    { name: 'Python' },
-    { name: 'FastAPI' },
-    { name: 'TypeScript' },
-    { name: 'React' },
-    { name: 'Node.js' },
-    { name: 'Docker' },
-    { name: 'PostgreSQL' },
-    { name: 'GitHub', icon: `${BASE}github.ico` },
-    { name: 'AWS', icon: `${BASE}aws-color.ico` },
+    { name: 'Python',     icon: `${SI}/python/3776AB` },
+    { name: 'FastAPI',    icon: `${SI}/fastapi/009688` },
+    { name: 'TypeScript', icon: `${SI}/typescript/3178C6` },
+    { name: 'React',      icon: `${SI}/react/61DAFB` },
+    { name: 'Node.js',    icon: `${SI}/nodedotjs/339933` },
+    { name: 'Docker',     icon: `${SI}/docker/2496ED` },
+    { name: 'PostgreSQL', icon: `${SI}/postgresql/336791` },
+    { name: 'GitHub',     icon: `${BASE}github.ico` },
+    { name: 'AWS',        icon: `${BASE}aws-color.ico` },
     { name: 'Google Colab', icon: `${BASE}colab-color.ico` },
-    { name: 'Nginx' },
-    { name: 'Linux' },
+    { name: 'Nginx',      icon: `${SI}/nginx/00AA4E` },
+    { name: 'Linux',      icon: `${SI}/linux/FCC624` },
 ];
 
 const techStackBottom: TechItem[] = [
-    { name: 'Pydantic-AI' },
-    { name: 'LangGraph', icon: `${BASE}langgraph-color.ico` },
-    { name: 'LangChain', icon: `${BASE}langchainLogo.ico` },
+    { name: 'Pydantic-AI', icon: `${SI}/pydantic/E92063` },
+    { name: 'LangGraph',   icon: `${BASE}langgraph-color.ico` },
+    { name: 'LangChain',   icon: `${BASE}langchainLogo.ico` },
     { name: 'pgvector' },
     { name: 'crawl4ai' },
     { name: 'SmolAgents' },
     { name: 'MCP Servers', icon: `${BASE}mcp.ico` },
-    { name: 'Anthropic', icon: `${BASE}anthropic.ico` },
-    { name: 'Claude', icon: `${BASE}claude-color.svg` },
-    { name: 'Gemini', icon: `${BASE}gemini-color.ico` },
-    { name: 'DeepSeek', icon: `${BASE}deepseek-color.ico` },
+    { name: 'Anthropic',   icon: `${BASE}anthropic.ico` },
+    { name: 'Claude',      icon: `${BASE}claude-color.ico` },
+    { name: 'Gemini',      icon: `${BASE}gemini-color.ico` },
+    { name: 'DeepSeek',    icon: `${BASE}deepseek-color.ico` },
     { name: 'HuggingFace', icon: `${BASE}huggingface-color.ico` },
-    { name: 'Ollama', icon: `${BASE}ollama.ico` },
-    { name: 'OpenAI' },
+    { name: 'Ollama',      icon: `${BASE}ollama.ico` },
+    { name: 'OpenAI',      icon: `${SI}/openai/FFFFFF` },
 ];
 
 // Duplicate for seamless infinite scroll
