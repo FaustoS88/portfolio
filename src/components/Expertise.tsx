@@ -1,5 +1,7 @@
 import type { Theme } from '../data/uiText';
 
+type TechItem = { name: string; icon?: string };
+
 type ExpertiseProps = {
     theme: Theme;
     text: {
@@ -9,18 +11,45 @@ type ExpertiseProps = {
     };
 };
 
+const BASE = '/portfolio/assets/';
+
+const techStackTop: TechItem[] = [
+    { name: 'Python' },
+    { name: 'FastAPI' },
+    { name: 'TypeScript' },
+    { name: 'React' },
+    { name: 'Node.js' },
+    { name: 'Docker' },
+    { name: 'PostgreSQL' },
+    { name: 'GitHub', icon: `${BASE}github.ico` },
+    { name: 'AWS', icon: `${BASE}aws-color.ico` },
+    { name: 'Google Colab', icon: `${BASE}colab-color.ico` },
+    { name: 'Nginx' },
+    { name: 'Linux' },
+];
+
+const techStackBottom: TechItem[] = [
+    { name: 'Pydantic-AI' },
+    { name: 'LangGraph', icon: `${BASE}langgraph-color.ico` },
+    { name: 'LangChain', icon: `${BASE}langchainLogo.ico` },
+    { name: 'pgvector' },
+    { name: 'crawl4ai' },
+    { name: 'SmolAgents' },
+    { name: 'MCP Servers', icon: `${BASE}mcp.ico` },
+    { name: 'Anthropic', icon: `${BASE}anthropic.ico` },
+    { name: 'Claude', icon: `${BASE}claude-color.svg` },
+    { name: 'Gemini', icon: `${BASE}gemini-color.ico` },
+    { name: 'DeepSeek', icon: `${BASE}deepseek-color.ico` },
+    { name: 'HuggingFace', icon: `${BASE}huggingface-color.ico` },
+    { name: 'Ollama', icon: `${BASE}ollama.ico` },
+    { name: 'OpenAI' },
+];
+
+// Duplicate for seamless infinite scroll
+const topRow = [...techStackTop, ...techStackTop];
+const bottomRow = [...techStackBottom, ...techStackBottom];
+
 const Expertise = ({ theme, text }: ExpertiseProps) => {
-    // We duplicate the lists to create a seamless infinite scroll effect
-    const techStackTop = [
-        "Python", "FastAPI", "TypeScript", "React", "Node.js", "Docker", "PostgreSQL", "Nginx", "Linux",
-        "Python", "FastAPI", "TypeScript", "React", "Node.js", "Docker", "PostgreSQL", "Nginx", "Linux"
-    ];
-
-    const techStackBottom = [
-        "Pydantic-AI", "LangGraph", "pgvector", "crawl4ai", "SmolAgents", "MCP Servers", "OpenAI", "Anthropic", "Gemini", "DeepSeek",
-        "Pydantic-AI", "LangGraph", "pgvector", "crawl4ai", "SmolAgents", "MCP Servers", "OpenAI", "Anthropic", "Gemini", "DeepSeek"
-    ];
-
     return (
         <section id="expertise" className={`py-24 sm:py-32 overflow-hidden relative border-t border-b ${theme === 'dark' ? 'bg-slate-950 border-white/5' : 'bg-white border-slate-200'}`}>
             {/* Background glow */}
@@ -39,16 +68,19 @@ const Expertise = ({ theme, text }: ExpertiseProps) => {
             <div className="w-full flex flex-col gap-6 sm:gap-8 relative select-none">
 
                 {/* Gradient Fades for the edges */}
-                <div className="absolute inset-y-0 left-0 w-16 sm:w-32 bg-gradient-to-r from-slate-950 to-transparent z-20 pointer-events-none"></div>
-                <div className="absolute inset-y-0 right-0 w-16 sm:w-32 bg-gradient-to-l from-slate-950 to-transparent z-20 pointer-events-none"></div>
+                <div className={`absolute inset-y-0 left-0 w-16 sm:w-32 z-20 pointer-events-none bg-gradient-to-r ${theme === 'dark' ? 'from-slate-950' : 'from-white'} to-transparent`}></div>
+                <div className={`absolute inset-y-0 right-0 w-16 sm:w-32 z-20 pointer-events-none bg-gradient-to-l ${theme === 'dark' ? 'from-slate-950' : 'from-white'} to-transparent`}></div>
 
                 {/* Top Row - Core Engineering */}
-                <div className="flex overflow-hidden w-full group">
+                <div className="flex overflow-hidden w-full">
                     <div className="animate-marquee items-center gap-4 sm:gap-6 min-w-full">
-                        {techStackTop.map((tech, idx) => (
-                            <div key={idx} className="px-6 py-3 sm:px-8 sm:py-4 bg-slate-900 border border-slate-800 rounded-full flex-shrink-0 flex items-center gap-2 group-hover/btn:border-emerald-500/50 transition-colors">
-                                <span className="text-slate-300 font-mono text-sm sm:text-base md:text-lg font-medium tracking-wide">
-                                    {tech}
+                        {topRow.map((tech, idx) => (
+                            <div key={idx} className={`px-5 py-3 sm:px-6 sm:py-4 border rounded-full flex-shrink-0 flex items-center gap-2 transition-colors ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-slate-100 border-slate-300'}`}>
+                                {tech.icon && (
+                                    <img src={tech.icon} alt={tech.name} className="h-5 w-5 object-contain flex-shrink-0" />
+                                )}
+                                <span className={`font-mono text-sm sm:text-base font-medium tracking-wide ${theme === 'dark' ? 'text-slate-300' : 'text-slate-700'}`}>
+                                    {tech.name}
                                 </span>
                             </div>
                         ))}
@@ -56,12 +88,15 @@ const Expertise = ({ theme, text }: ExpertiseProps) => {
                 </div>
 
                 {/* Bottom Row - AI Intelligence */}
-                <div className="flex overflow-hidden w-full group">
+                <div className="flex overflow-hidden w-full">
                     <div className="animate-marquee-slow items-center gap-4 sm:gap-6 min-w-full" style={{ animationDirection: 'reverse' }}>
-                        {techStackBottom.map((tech, idx) => (
-                            <div key={idx} className="px-6 py-3 sm:px-8 sm:py-4 bg-emerald-950/20 border border-emerald-900/30 rounded-full flex-shrink-0 flex items-center gap-2 group-hover/btn:border-emerald-500/50 transition-colors">
-                                <span className="text-emerald-400 font-mono text-sm sm:text-base md:text-lg font-medium tracking-wide">
-                                    {tech}
+                        {bottomRow.map((tech, idx) => (
+                            <div key={idx} className={`px-5 py-3 sm:px-6 sm:py-4 border rounded-full flex-shrink-0 flex items-center gap-2 transition-colors ${theme === 'dark' ? 'bg-emerald-950/20 border-emerald-900/30' : 'bg-emerald-50 border-emerald-200'}`}>
+                                {tech.icon && (
+                                    <img src={tech.icon} alt={tech.name} className="h-5 w-5 object-contain flex-shrink-0" />
+                                )}
+                                <span className={`font-mono text-sm sm:text-base font-medium tracking-wide ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-700'}`}>
+                                    {tech.name}
                                 </span>
                             </div>
                         ))}
